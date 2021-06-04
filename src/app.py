@@ -1,3 +1,17 @@
+'''
+python -m pip install couchbase
+python -m pip install flask
+python -m pip install bcrypt
+python -m pip install python-dotenv
+
+export FLASK_APP=src/app && \
+export FLASK_ENV=development
+
+NOTE:  make sure to change into the src 
+    directory before running flask
+
+flask run
+'''
 #setup flask
 from flask import Flask, jsonify, request
 from codecs import decode
