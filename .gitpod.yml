@@ -6,7 +6,7 @@ tasks:
   command:  cd /opt/couchbase/ && ./start-cb.sh
 - name: Start app
   init: cd src
-  command:  while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' -u Administrator:password localhost:8091/pools/default/buckets/)" != "200" ]]; do sleep 5; done && flask run 
+  command:  while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' -u Administrator:password localhost:8091/pools/default/buckets/)" != "200" ]]; do sleep 5; done
 
 # exposed ports
 ports:
