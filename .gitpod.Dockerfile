@@ -6,9 +6,9 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive &&\
  apt-get update &&\ 
  apt-get install -y python3.8 &&\
  export PATH="$PATH:/usr/local/bin" &&\
- python3 -m pip install couchbase &&\
- python3 -m pip install flask &&\
- python3 -m pip install bcrypt &&\
- python3 -m pip install python-dotenv &&\
+ python3 -m pip3 install couchbase &&\
+ python3 -m pip3 install flask &&\
+ python3 -m pip3 install bcrypt &&\
+ python3 -m pip3 install python-dotenv &&\
  export FLASK_APP=src/app &&\
  export FLASK_ENV=development
