@@ -51,4 +51,4 @@ python test.py
 
 ## Conclusion
 
-Setting up a basic REST API in Flask and Python with Couchbase is fairly simple.  In this project when ran with Couchbase Server 7 installed, it will create a bucket in Couchbase, an index for our parameterized link:https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html[N1QL query], and showcases basic CRUD operations needed in most applications.
+Setting up a basic REST API in Flask and Python with Couchbase is fairly simple.  In this project when ran with Couchbase Server 7 installed, it will create a bucket in Couchbase, an index for our parameterized [N1QL query](https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html), and showcases basic CRUD operations needed in most applications.
