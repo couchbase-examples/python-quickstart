@@ -22,6 +22,7 @@ python -m pip install couchbase
 python -m pip install flask
 python -m pip install bcrypt
 python -m pip install python-dotenv
+python -m pip install flask-restx
 ```
 
 ### Database Server Configuration

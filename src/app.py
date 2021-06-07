@@ -3,6 +3,7 @@ python -m pip install couchbase
 python -m pip install flask
 python -m pip install bcrypt
 python -m pip install python-dotenv
+python -m pip install flask-restx
 
 export FLASK_APP=src/app && \
 export FLASK_ENV=development
@@ -14,6 +15,7 @@ flask run
 '''
 #setup flask
 from flask import Flask, jsonify, request
+from flask_restx import Resource, Api, fields
 from codecs import decode
 
 #setup couchbase
@@ -131,96 +133,152 @@ class CouchbaseClient(object):
     def query(self, strQuery):
         return self._bucket.query(strQuery)
 
-#setup app and api's using Flask
-app = Flask(__name__)
-
 #setup API endpoints
 
+#setup app and api's using Flask
+app = Flask(__name__)
+api = Api(app, version="1.0", title="Python API Quickstart - Profile", description="Couchbase Quickstart API with Python, Flask, and Flask-RestX")
+nsHealthCheck = api.namespace("api/v1/healthcheck", description="Sanity check for unit tests")
+nsProfile = api.namespace("api/v1/profile", "CRUD operations for Profile")
+
+#setup models for post, put, search
+profileInsert = api.model(
+    "ProfileInsert",
+    {
+        "firstName": fields.String(required=False, description="User First Name"),
+        "lastName": fields.String(required=False, description="User First Name"),
+        "email": fields.String(required=True, description="User Email Address"),
+        "password": fields.String(required=True, description="User password unecrypted")
+    },
+)
+
+profile = api.model(
+    "Profile",
+    {
+        "pid": fields.String(required=True, description="ID of the document (UUID)"),
+        "firstName": fields.String(required=False, description="User First Name"),
+        "lastName": fields.String(required=False, description="User First Name"),
+        "email": fields.String(required=True, description="User Email Address"),
+        "password": fields.String(required=True, description="User password unecrypted")
+    },
+)
+
+searchProfile = api.model(
+    "SearchProfile",
+    {
+        "search": fields.String(required=True, description="value to search for"),
+        "limit": fields.Integer(required=True, description="int value of how many documents to return"),
+        "skip": fields.Integer(required=True, desciption="int value of how many documents to skip")
+    }
+)
+
+@nsHealthCheck.route('')
+class HealthCheck(Resource):
+    # tag::get[]
+    def get(self):
+        return "{\"time\": \"" + datetime.now().strftime("%m/%d/%Y, %H:%M:%S") + "\"}"
+    #end::get[]
+
+@nsProfile.route('')
+class Profile(Resource):
+    # tag::post[]
+    @nsProfile.doc("Create Profile", reponses={ 201: 'Created', 409: 'Key alreay exists', 500: 'Unexpected Error' })
+    @nsProfile.expect(profileInsert)
+    @nsProfile.marshal_with(profile)
+    def post(self):
+        try:
+            data = request.json
+            #create new random key
+            key = uuid.uuid4().__str__()
+            data["pid"] = key
+            #encrypt password
+            hashed = bcrypt.hashpw(data["password"].encode('utf-8'), bcrypt.gensalt()).decode()
+            data["password"] = hashed
+            cb.insert(key, data)
+            return data, 201
+        except DocumentExistsException:
+            return 'Key already exists', 409
+        except CouchbaseException as e:
+            return 'Unexpected error: {}'.format(e), 500
+        except Exception as e:
+            return 'Unexpected error: {}'.format(e), 500
+    # end::post[]
+
+@nsProfile.route('/<id>')
+class ProfileId(Resource):
+    # tag::get[]
+    @nsProfile.doc("Get Profile", reponses={200: 'Found document', 404: 'Key not found', 500: 'Unexpected Error'})
+    def get(self, id):
+        try:
+            res = cb.get(id)
+            return jsonify(res.content_as[dict])  
+        except DocumentNotFoundException:
+            return 'Key not found', 404
+        except CouchbaseException as e:
+            return 'Unexpected error: {}'.format(e), 500
+    # end::get[]    
+
+    # tag::put[]
+    @nsProfile.doc("Update Profile", reponses={200: 'Document updated', 404: 'Document not found', 500: 'Unexpected Error'})
+    @nsProfile.expect(profileInsert)
+    @nsProfile.marshal_with(profile)
+    def put(self,id):
+        try:
+            data = request.json
+            #create new random key
+            data["pid"] = id 
+            #encrypt password
+            hashed = bcrypt.hashpw(data["password"].encode('utf-8'), bcrypt.gensalt()).decode()
+            data["password"] = hashed
+            cb.upsert(id, data)
+            return data 
+        except DocumentNotFoundException:
+            # Document already deleted / never existed
+            return 'Key does not exist', 404
+        except CouchbaseException as e:
+            return 'Unexpected error: {}'.format(e), 500
+        except Exception as e:
+            return 'Unexpected error: {}'.format(e), 500
+    # end::put[]
+
+    # tag::delete[]
+    @nsProfile.doc("Delete Profile", reponses={200: 'Delete document', 404: 'Document not found', 500: 'Unexpected Error'})
+    def delete(self,id):
+        try:
+            cb.remove(id)
+            return 'OK'
+        except DocumentNotFoundException:
+            # Document already deleted / never existed
+            return 'Key does not exist', 404
+        except Exception as e:
+            return 'Unexpected error: {}'.format(e), 500
+    # end::delete[]
+
+
 # tag::get[]
-@app.route('/api/v1/healthCheck/', methods=['GET'])
-def healthCheck():
-    return "{\"time\": \"" + datetime.now().strftime("%m/%d/%Y, %H:%M:%S") + "\"}"
-#end::get[]
+@nsProfile.route('/profiles')
+class Profiles(Resource):
+    @nsProfile.doc("Find Profiles", reponses={ 201: 'found', 500: 'Unexpected Error' }, params= {'search':'value to search for', 'limit': 'int value of number of records to return', 'skip': 'int value of how many documents to skip'})
+    def get(self):
+        try:
+            #get vars from GET request
+            search = request.args.get("search")
+            limit = request.args.get("limit")
+            skip = request.args.get("skip")
 
-# tag::post[]
-@app.route('/api/v1/profile/', methods=['POST'])
-def post():
-    try:
-        data = request.json
-        #create new random key
-        key = uuid.uuid4().__str__()
-        data["pid"] = key
-        #encrypt password
-        hashed = bcrypt.hashpw(data["password"].encode('utf-8'), bcrypt.gensalt()).decode()
-        data["password"] = hashed
-        cb.insert(key, data)
-        return data, 201
-    except DocumentExistsException:
-        return 'Key already exists', 409
-    except CouchbaseException as e:
-        return 'Unexpected error: {}'.format(e), 500
-    except Exception as e:
-        return 'Unexpected error: {}'.format(e), 500
-# end::post[]
+            #create query
+            query = f"SELECT p.* FROM  {db_info['bucket']}.{db_info['scope']}.{db_info['collection']} p WHERE lower(p.firstName) LIKE '%{search.lower()}%' OR lower(p.lastName) LIKE '%{search.lower()}%' LIMIT {limit} OFFSET {skip}"
+            res = cb.query(query)
 
-# tag::get[]
-@app.route('/api/v1/profile/<key>', methods=['GET'])
-def get(key):
-    try:
-        res = cb.get(key)
-        return jsonify(res.content_as[dict])  
-    except DocumentNotFoundException:
-        return 'Key not found', 404
-    except CouchbaseException as e:
-        return 'Unexpected error: {}'.format(e), 500
-# end::get[]    
-
-# tag::put[]
-@app.route('/api/v1/profile/<key>', methods=['PUT'])
-def put(key):
-    try:
-        cb.upsert(key, request.json)
-        return 'OK'
-    except CouchbaseException as e:
-        return 'Unexpected error: {}'.format(e), 500
-# end::put[]
-
-# tag::delete[]
-@app.route('/api/v1/profile/<key>', methods=['DELETE'])
-def delete(key):
-    try:
-        cb.remove(key)
-        return 'OK'
-    except DocumentNotFoundException:
-        # Document already deleted / never existed
-        return 'Key does not exist', 404
-# end::delete[]
-
-
-# tag::get[]
-@app.route('/api/v1/profiles', methods=['GET'])
-def getProfiles():
-    try:
-        #get vars from GET request
-        search = request.args.get("search")
-        limit = request.args.get("limit")
-        skip = request.args.get("skip")
-
-        #create query
-        query = f"SELECT p.* FROM  {db_info['bucket']}.{db_info['scope']}.{db_info['collection']} p WHERE lower(p.firstName) LIKE '%{search.lower()}%' OR lower(p.lastName) LIKE '%{search.lower()}%' LIMIT {limit} OFFSET {skip}"
-        res = cb.query(query)
-
-        #must loop through results
-        #https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html#streaming-large-result-sets
-        profiles = []
-        for x in res:
-            profiles.append(x)
-        return jsonify(profiles)  
-    except DocumentNotFoundException:
-        return 'Key not found', 404
-    except CouchbaseException as e:
-        return 'Unexpected error: {}'.format(e), 500
-# end::get[]   
+            #must loop through results
+            #https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html#streaming-large-result-sets
+            profiles = []
+            for x in res:
+                profiles.append(x)
+            return jsonify(profiles)  
+        except CouchbaseException as e:
+            return 'Unexpected error: {}'.format(e), 500
+    # end::get[]   
 
 # done for example purposes only, some
 # sort of configuration should be used
