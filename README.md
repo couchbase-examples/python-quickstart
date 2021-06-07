@@ -20,9 +20,9 @@ Dependencies can be installed through PIP the default package manage for Python.
 ```sh
 python -m pip install couchbase
 python -m pip install flask
+python -m pip install flask-restx
 python -m pip install bcrypt
 python -m pip install python-dotenv
-python -m pip install flask-restx
 ```
 
 ### Database Server Configuration

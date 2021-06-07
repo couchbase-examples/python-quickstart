@@ -163,15 +163,6 @@ profile = api.model(
     },
 )
 
-searchProfile = api.model(
-    "SearchProfile",
-    {
-        "search": fields.String(required=True, description="value to search for"),
-        "limit": fields.Integer(required=True, description="int value of how many documents to return"),
-        "skip": fields.Integer(required=True, desciption="int value of how many documents to skip")
-    }
-)
-
 @nsHealthCheck.route('')
 class HealthCheck(Resource):
     # tag::get[]
