@@ -26,7 +26,9 @@ python -m pip install -r requirements.txt
 
 ### Database Server Configuration
 
-All configuration for communication with the database is stored in the app.py file in a dictionary named db_info. This includes the connection string, username, password, bucket name, colleciton name, and scope name. The default username is assumed to be `Administrator` and the default password is assumed to be `password`. If these are different in your environment you will need to change them before running the application.
+All configuration for communication with the database is stored in the `.env` file in the src folder. This includes the connection string, username, password, bucket name, colleciton name, and scope name.
+
+There is an example file `.env.example` that can be used as the template for the pararmeters for your environment. You can copy this file and fill in with the values corresponding to your environment.
 
 ## Running The Application
 
