@@ -4,14 +4,11 @@ image:
 tasks:
   - name: Start Couchbase
     command: cd /opt/couchbase/ && ./start-cb.sh
-  - name: Start app
-    init: cd src
-    command: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' -u Administrator:password localhost:8091/pools/default/buckets/)" != "200" ]]; do sleep 5; done
   - name: Log use
     command: curl -s 'https://da-demo-images.s3.amazonaws.com/runItNow_outline.png?couchbase-example=python-quickstart-repo&source=gitpod' > /dev/null
-  - name: Install Flask Requirements
-    init: cd src
-    command: python3 -m pip install -r requirements.txt
+  - name: Start app
+    init: cd src && python3 -m pip install -r requirements.txt
+    command: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' -u Administrator:password localhost:8091/pools/default/buckets/)" != "200" ]]; do sleep 5; done && flask run
 
 # exposed ports
 ports:
