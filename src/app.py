@@ -81,14 +81,14 @@ class CouchbaseClient(object):
             colSpec = CollectionSpec(self.collection_name, self.scope_name)
             self._bucket.collections().create_collection(colSpec)
 
+            # create index if it doesn't exist
+            # sleep to ensure that the operations are finished before trying to create the index
+            time.sleep(6)
         except CollectionAlreadyExistsException:
             print("Collection already exists")
 
         self._collection = self._bucket.collection(self.collection_name)
 
-        # create index if it doesn't exist
-        # sleep to ensure that the operations are finished before trying to create the index
-        time.sleep(6)
         try:
             # create index if it doesn't exist
             createIndexProfile = f"CREATE PRIMARY INDEX default_profile_index ON {self.bucket_name}.{self.scope_name}.{self.collection_name}"
@@ -315,7 +315,6 @@ class Profiles(Resource):
 
             # create query
             query = f"SELECT p.* FROM  {db_info['bucket']}.{db_info['scope']}.{db_info['collection']} p WHERE lower(p.firstName) LIKE $search_str OR lower(p.lastName) LIKE $search_str LIMIT $limit OFFSET $offset;"
-            print(query)
             res = cb.query(query, limit=limit, offset=skip, search_str=search_str)
 
             # must loop through results
