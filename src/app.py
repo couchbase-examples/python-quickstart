@@ -146,7 +146,7 @@ class CouchbaseClient(object):
 app = Flask(__name__)
 
 
-@app.route("/start")
+@app.route("/")
 def hello():
     return render_template("loading_spinner.html")
     # BASE = "http://127.0.0.1:5000"
@@ -162,7 +162,7 @@ api = Api(
     version="1.0",
     title="Python API Quickstart - Profile",
     description="Couchbase Quickstart API with Python, Flask, and Flask-RestX",
-    default="start",
+    doc="/doc",
 )
 nsHealthCheck = api.namespace(
     "api/v1/healthcheck", description="Sanity check for unit tests"
