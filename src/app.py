@@ -37,7 +37,7 @@ class CouchbaseClient(object):
     def create_client(_, *args, **kwargs):
         self = CouchbaseClient(*args)
         print(
-            "The application is initializing\n Please wait until it loads\n Refresh the page if the page is not loading automatically"
+            "\n The application is initializing\n Please wait until it loads\n Refresh the page if the page is not loading automatically"
         )
         connected = self.ping()
         if not connected:
