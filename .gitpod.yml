@@ -8,7 +8,7 @@ tasks:
     command: curl -s 'https://da-demo-images.s3.amazonaws.com/runItNow_outline.png?couchbase-example=python-quickstart-repo&source=gitpod' > /dev/null
   - name: Start app
     init: cd src && python3 -m pip install -r requirements.txt
-    command: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' -u Administrator:password localhost:8091/pools/default/buckets/)" != "200" ]]; do sleep 5; done && flask run && gp preview $(gp url 5000)/start
+    command: while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' -u Administrator:password localhost:8091/pools/default/buckets/)" != "200" ]]; do sleep 5; done && flask run && gp preview $(gp url 5000)
 
 # exposed ports
 ports:
