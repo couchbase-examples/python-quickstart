@@ -148,7 +148,6 @@ app = Flask(__name__)
 
 @app.route("/start")
 def hello():
-    print("hello")
     return render_template("loading_spinner.html")
     # BASE = "http://127.0.0.1:5000"
     # while True:
