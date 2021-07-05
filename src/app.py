@@ -17,6 +17,7 @@ import os
 from attr import validate
 import bcrypt
 from dotenv import load_dotenv
+import requests
 
 # setup couchbase
 from couchbase.auth import PasswordAuthenticator
@@ -27,7 +28,7 @@ from couchbase.management.buckets import BucketSettings
 from couchbase.management.collections import CollectionSpec
 
 # setup flask
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, redirect, render_template
 from flask_restx import Api, Resource, fields
 
 
@@ -143,11 +144,26 @@ class CouchbaseClient(object):
 
 # setup app and APIs using Flask
 app = Flask(__name__)
+
+
+@app.route("/start")
+def hello():
+    print("hello")
+    return render_template("loading_spinner.html")
+    # BASE = "http://127.0.0.1:5000"
+    # while True:
+    # response = requests.get(f"{BASE}/api/v1/healthcheck/")
+    # if response.status_code == 200:
+    # return redirect(BASE, 301)
+    # time.sleep(2)
+
+
 api = Api(
     app,
     version="1.0",
     title="Python API Quickstart - Profile",
     description="Couchbase Quickstart API with Python, Flask, and Flask-RestX",
+    default="start",
 )
 nsHealthCheck = api.namespace(
     "api/v1/healthcheck", description="Sanity check for unit tests"
