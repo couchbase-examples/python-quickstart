@@ -145,7 +145,7 @@ class CouchbaseClient(object):
 app = Flask(__name__)
 
 
-@app.route("/")
+@app.route("/splash")
 def start_page():
     """Function to load the splash screen mainly for gitpod demo"""
     return render_template("splash_screen.html")
@@ -156,7 +156,7 @@ api = Api(
     version="1.0",
     title="Python API Quickstart - Profile",
     description="Couchbase Quickstart API with Python, Flask, and Flask-RestX",
-    doc="/doc",
+    # doc="/doc",
 )
 nsHealthCheck = api.namespace(
     "api/v1/healthcheck", description="Sanity check for unit tests"
