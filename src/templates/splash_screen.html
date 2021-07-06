@@ -4,6 +4,7 @@
    <meta charset="UTF-8">
    <title>Starting App, please wait</title>
 </head>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 <body>
 <div>
 Please wait while the database operations are being performed. <br>
@@ -12,9 +13,22 @@ If the page does not reload automatically, Please refresh the <a href="/doc">pag
 </div>
 </body>
 <script>
-   function myFunction() {
-   location.replace("/doc")
-   }
-   setTimeout(function(){ myFunction(); }, 3000);
+   // Redirect to the swagger documentation if the health check is okay
+   $(document).ready(function(){
+      $.ajax({
+         type: "GET",
+         url:  "/api/v1/healthcheck/",
+      })
+   .done(function(data){
+      window.location.replace("/doc");    
+   })
+   .fail(function(jqXHR, textStatus){
+      location.reload().delay(2000);
+   })
+});
+// function myFunction() {
+   // location.replace("/doc")
+   // }
+   // setTimeout(function(){ myFunction(); }, 3000);
 </script>
 </html>
