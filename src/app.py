@@ -27,7 +27,7 @@ from couchbase.management.buckets import BucketSettings
 from couchbase.management.collections import CollectionSpec
 
 # setup flask
-from flask import Flask, jsonify, request, redirect, render_template
+from flask import Flask, jsonify, request, render_template
 from flask_restx import Api, Resource, fields
 
 
@@ -147,7 +147,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def start_page():
-    """Function to load the splash screen mainly for gitpod demo as the initialization takes time"""
+    """Function to load the splash screen mainly for gitpod demo as the initialization takes time4"""
     return render_template("splash_screen.html")
 
 
