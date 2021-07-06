@@ -17,7 +17,6 @@ import os
 from attr import validate
 import bcrypt
 from dotenv import load_dotenv
-import requests
 
 # setup couchbase
 from couchbase.auth import PasswordAuthenticator
@@ -147,14 +146,9 @@ app = Flask(__name__)
 
 
 @app.route("/")
-def hello():
-    return render_template("loading_spinner.html")
-    # BASE = "http://127.0.0.1:5000"
-    # while True:
-    # response = requests.get(f"{BASE}/api/v1/healthcheck/")
-    # if response.status_code == 200:
-    # return redirect(BASE, 301)
-    # time.sleep(2)
+def start_page():
+    """Function to load the splash screen mainly for gitpod demo"""
+    return render_template("splash_screen.html")
 
 
 api = Api(
@@ -348,8 +342,7 @@ class Profiles(Resource):
 
 
 load_dotenv()
-# done for example purposes only, some
-# sort of configuration should be used
+
 db_info = {
     "host": os.getenv("DB_HOST"),
     "bucket": os.getenv("BUCKET"),
