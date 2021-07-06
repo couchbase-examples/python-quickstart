@@ -147,7 +147,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def start_page():
-    """Function to load the splash screen mainly for gitpod demo"""
+    """Function to load the splash screen mainly for gitpod demo as the initialization takes time"""
     return render_template("splash_screen.html")
 
 
