@@ -22,7 +22,14 @@ from dotenv import load_dotenv
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster, ClusterOptions
 from couchbase.diagnostics import PingState
-from couchbase.exceptions import *
+from couchbase.exceptions import (
+    CouchbaseException,
+    CollectionAlreadyExistsException,
+    BucketAlreadyExistsException,
+    QueryIndexAlreadyExistsException,
+    DocumentNotFoundException,
+    DocumentExistsException,
+)
 from couchbase.management.buckets import BucketSettings
 from couchbase.management.collections import CollectionSpec
 
@@ -35,9 +42,7 @@ class CouchbaseClient(object):
     @classmethod
     def create_client(_, *args, **kwargs):
         self = CouchbaseClient(*args)
-        print(
-            "\n The application is initializing\n Please wait until it loads\n Refresh the page if the page is not loading automatically\n"
-        )
+        print("\n The application is initializing\n Please wait until it loads \n")
         connected = self.ping()
         if not connected:
             self.connect(**kwargs)
@@ -86,6 +91,7 @@ class CouchbaseClient(object):
 
             # create index if it doesn't exist
             # sleep to ensure that the operations are finished before trying to create the index
+            print("\n The application is initializing\n Please wait until it loads \n")
             time.sleep(6)
         except CollectionAlreadyExistsException:
             print("Collection already exists")
