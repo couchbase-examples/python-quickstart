@@ -21,6 +21,15 @@ ports:
   - port: 4369
     onOpen: ignore
 
+github:
+  prebuilds:
+    # enable for the master/default branch (defaults to true)
+    master: true
+    # enable for all branches in this repo (defaults to false)
+    branches: true
+    # enable for pull requests coming from this repo (defaults to true)
+    pullRequests: true
+
 vscode:
   extensions:
     - ms-python.python
