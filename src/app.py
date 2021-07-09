@@ -154,8 +154,11 @@ app = Flask(__name__)
 @app.route("/")
 def start_page():
     """Function to load the splash screen mainly for gitpod demo as the initialization takes time4"""
+    print("Rendering Splash Screen")
     return render_template("splash_screen.html")
 
+
+print("Initialize splash screen")
 
 api = Api(
     app,
@@ -359,6 +362,7 @@ db_info = {
 }
 
 cb = CouchbaseClient.create_client(*db_info.values())
+print("Starting App")
 
 if __name__ == "__main__":
     app.run(debug=True)
