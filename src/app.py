@@ -155,6 +155,8 @@ app = Flask(__name__)
 def start_page():
     """Function to load the splash screen mainly for gitpod demo as the initialization takes time4"""
     print("Rendering Splash Screen")
+    global cb
+    cb = CouchbaseClient.create_client(*db_info.values())
     return render_template("splash_screen.html")
 
 
@@ -360,8 +362,8 @@ db_info = {
     "username": os.getenv("USERNAME"),
     "password": os.getenv("PASSWORD"),
 }
-
-cb = CouchbaseClient.create_client(*db_info.values())
+cb = ""
+# cb = CouchbaseClient.create_client(*db_info.values())
 print("Starting App")
 
 if __name__ == "__main__":
