@@ -17,6 +17,7 @@ from attr import validate
 import bcrypt
 from dotenv import load_dotenv
 import asyncio
+import time
 
 # setup couchbase
 from couchbase.auth import PasswordAuthenticator
@@ -45,7 +46,7 @@ class CouchbaseClient(object):
         print("\n The application is initializing\n Please wait until it loads \n")
         connected = self.ping()
         if not connected:
-            await self.connect(**kwargs)
+            self.connect(**kwargs)
         return self
 
     _instance = None
@@ -61,7 +62,7 @@ class CouchbaseClient(object):
             CouchbaseClient._instance.password = pw
         return CouchbaseClient._instance
 
-    async def connect(self, **kwargs):
+    def connect(self, **kwargs):
         # note: kwargs would be how one could pass in
         #       more info for client config
         conn_str = f"couchbase://{self.host}"
@@ -92,7 +93,7 @@ class CouchbaseClient(object):
             # create index if it doesn't exist
             # sleep to ensure that the operations are finished before trying to create the index
             print("\n The application is initializing\n Please wait until it loads \n")
-            await asyncio.sleep(6)
+            time.sleep(6)
         except CollectionAlreadyExistsException:
             print("Collection already exists")
 
