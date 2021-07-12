@@ -92,7 +92,7 @@ class CouchbaseClient(object):
             # create index if it doesn't exist
             # sleep to ensure that the operations are finished before trying to create the index
             print("\n The application is initializing\n Please wait until it loads \n")
-            asyncio.sleep(6)
+            await asyncio.sleep(6)
         except CollectionAlreadyExistsException:
             print("Collection already exists")
 
