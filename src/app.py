@@ -17,6 +17,7 @@ import os
 from attr import validate
 import bcrypt
 from dotenv import load_dotenv
+import asyncio
 
 # setup couchbase
 from couchbase.auth import PasswordAuthenticator
@@ -40,7 +41,7 @@ from flask_restx import Api, Resource, fields
 
 class CouchbaseClient(object):
     @classmethod
-    def create_client(_, *args, **kwargs):
+    async def create_client(_, *args, **kwargs):
         self = CouchbaseClient(*args)
         print("\n The application is initializing\n Please wait until it loads \n")
         connected = self.ping()
@@ -155,8 +156,8 @@ app = Flask(__name__)
 def start_page():
     """Function to load the splash screen mainly for gitpod demo as the initialization takes time4"""
     print("Rendering Splash Screen")
-    global cb
-    cb = CouchbaseClient.create_client(*db_info.values())
+    # global cb
+    # cb = CouchbaseClient.create_client(*db_info.values())
     return render_template("splash_screen.html")
 
 
@@ -362,9 +363,16 @@ db_info = {
     "username": os.getenv("USERNAME"),
     "password": os.getenv("PASSWORD"),
 }
-cb = ""
-# cb = CouchbaseClient.create_client(*db_info.values())
+# cb = None
+# x = threading.Thread(CouchbaseClient.create_client, *db_info.values())
+# x.start()
+async def db_operations(db_info):
+    cb = await CouchbaseClient.create_client(*db_info.values())
+    return cb
+
+
 print("Starting App")
+cb = asyncio.run(db_operations(db_info))
 
 if __name__ == "__main__":
     app.run(debug=True)
