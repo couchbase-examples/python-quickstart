@@ -9,7 +9,6 @@ NOTE:  make sure to change into the src
 
 flask run
 """
-import time
 import uuid
 from codecs import decode
 from datetime import datetime
@@ -46,7 +45,7 @@ class CouchbaseClient(object):
         print("\n The application is initializing\n Please wait until it loads \n")
         connected = self.ping()
         if not connected:
-            self.connect(**kwargs)
+            await self.connect(**kwargs)
         return self
 
     _instance = None
@@ -62,7 +61,7 @@ class CouchbaseClient(object):
             CouchbaseClient._instance.password = pw
         return CouchbaseClient._instance
 
-    def connect(self, **kwargs):
+    async def connect(self, **kwargs):
         # note: kwargs would be how one could pass in
         #       more info for client config
         conn_str = f"couchbase://{self.host}"
@@ -93,7 +92,7 @@ class CouchbaseClient(object):
             # create index if it doesn't exist
             # sleep to ensure that the operations are finished before trying to create the index
             print("\n The application is initializing\n Please wait until it loads \n")
-            time.sleep(6)
+            asyncio.sleep(6)
         except CollectionAlreadyExistsException:
             print("Collection already exists")
 
