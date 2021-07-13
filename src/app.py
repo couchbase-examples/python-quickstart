@@ -373,27 +373,27 @@ db_info = {
     "password": os.getenv("PASSWORD"),
 }
 
-cb = None
+# cb = None
 # x = threading.Thread(CouchbaseClient.create_client, *db_info.values())
 # x.start()
 # async def db_operations(db_info):
 # cb = await CouchbaseClient.create_client(*db_info.values())
 # return cb
-def db_operations(db_info):
-    global cb
-    cb = CouchbaseClient(*db_info.values())
-    cb.connect()
+# def db_operations(db_info):
+#     global cb
+#     cb = CouchbaseClient(*db_info.values())
+#     cb.connect()
 
 
 # print("Starting App")
 # cb = asyncio.run(db_operations(db_info))
 # cb = CouchbaseClient.create_client(*db_info.values())
-# cb = CouchbaseClient(*db_info.values())
-# cb.connect()
+cb = CouchbaseClient(*db_info.values())
+cb.connect()
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-    p = Process(target=db_operations, args=db_info)
-    p.start()
-    p.join()
+    # p = Process(target=db_operations, args=db_info)
+    # p.start()
+    # p.join()
