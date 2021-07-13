@@ -388,12 +388,14 @@ db_info = {
 # print("Starting App")
 # cb = asyncio.run(db_operations(db_info))
 # cb = CouchbaseClient.create_client(*db_info.values())
-cb = CouchbaseClient(*db_info.values())
-cb.connect()
+# cb = CouchbaseClient(*db_info.values())
+# cb.connect()
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
-    # p = Process(target=db_operations, args=db_info)
-    # p.start()
-    # p.join()
+    app.run(debug=False, use_reloader=False)
+cb = CouchbaseClient(*db_info.values())
+cb.connect()
+# p = Process(target=db_operations, args=db_info)
+# p.start()
+# p.join()
