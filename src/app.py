@@ -41,7 +41,7 @@ from flask_restx import Api, Resource, fields
 
 class CouchbaseClient(object):
     @classmethod
-    async def create_client(_, *args, **kwargs):
+    def create_client(_, *args, **kwargs):
         self = CouchbaseClient(*args)
         print("\n The application is initializing\n Please wait until it loads \n")
         connected = self.ping()
@@ -76,26 +76,26 @@ class CouchbaseClient(object):
             print(f"Could not connect to cluster. Error: {error}")
             raise
 
-        try:
-            # create bucket if it doesn't exist
-            bucketSettings = BucketSettings(name=self.bucket_name, ram_quota_mb=256)
-            self._cluster.buckets().create_bucket(bucketSettings)
-        except BucketAlreadyExistsException:
-            print("Bucket already exists")
+        # try:
+        #     # create bucket if it doesn't exist
+        #     bucketSettings = BucketSettings(name=self.bucket_name, ram_quota_mb=256)
+        #     self._cluster.buckets().create_bucket(bucketSettings)
+        # except BucketAlreadyExistsException:
+        #     print("Bucket already exists")
 
         self._bucket = self._cluster.bucket(self.bucket_name)
 
-        try:
-            # create collection if it doesn't exist
-            colSpec = CollectionSpec(self.collection_name, self.scope_name)
-            self._bucket.collections().create_collection(colSpec)
-        except CollectionAlreadyExistsException:
-            print("Collection already exists")
+        # try:
+        #     # create collection if it doesn't exist
+        #     colSpec = CollectionSpec(self.collection_name, self.scope_name)
+        #     self._bucket.collections().create_collection(colSpec)
+        # except CollectionAlreadyExistsException:
+        #     print("Collection already exists")
 
         # create index if it doesn't exist
         # sleep to ensure that the bucket & collection creation operations are finished before trying to create the index
-        print("\n The application is initializing\n Please wait until it loads \n")
-        time.sleep(6)
+        # print("\n The application is initializing\n Please wait until it loads \n")
+        # time.sleep(6)
 
         self._collection = self._bucket.collection(self.collection_name)
 
@@ -155,13 +155,13 @@ app = Flask(__name__)
 @app.route("/")
 def start_page():
     """Function to load the splash screen mainly for gitpod demo as the initialization takes time4"""
-    print("Rendering Splash Screen")
+    # print("Rendering Splash Screen")
     # global cb
     # cb = CouchbaseClient.create_client(*db_info.values())
     return render_template("splash_screen.html")
 
 
-print("Initialize splash screen")
+# print("Initialize splash screen")
 
 api = Api(
     app,
@@ -366,13 +366,13 @@ db_info = {
 # cb = None
 # x = threading.Thread(CouchbaseClient.create_client, *db_info.values())
 # x.start()
-async def db_operations(db_info):
-    cb = await CouchbaseClient.create_client(*db_info.values())
-    return cb
+# async def db_operations(db_info):
+# cb = await CouchbaseClient.create_client(*db_info.values())
+# return cb
 
 
-print("Starting App")
-cb = asyncio.run(db_operations(db_info))
-
+# print("Starting App")
+# cb = asyncio.run(db_operations(db_info))
+cb = CouchbaseClient.create_client(*db_info.values())
 if __name__ == "__main__":
     app.run(debug=True)
