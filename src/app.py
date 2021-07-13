@@ -89,13 +89,13 @@ class CouchbaseClient(object):
             # create collection if it doesn't exist
             colSpec = CollectionSpec(self.collection_name, self.scope_name)
             self._bucket.collections().create_collection(colSpec)
-
-            # create index if it doesn't exist
-            # sleep to ensure that the operations are finished before trying to create the index
-            print("\n The application is initializing\n Please wait until it loads \n")
-            time.sleep(6)
         except CollectionAlreadyExistsException:
             print("Collection already exists")
+
+        # create index if it doesn't exist
+        # sleep to ensure that the bucket & collection creation operations are finished before trying to create the index
+        print("\n The application is initializing\n Please wait until it loads \n")
+        time.sleep(6)
 
         self._collection = self._bucket.collection(self.collection_name)
 
