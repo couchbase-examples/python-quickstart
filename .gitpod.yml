@@ -13,7 +13,7 @@ tasks:
 # exposed ports
 ports:
   - port: 5000
-    onOpen: open-browser
+    onOpen: open-preview
   - port: 8091
     onOpen: open-browser
   - port: 8092-22000
