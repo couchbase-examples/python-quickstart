@@ -40,27 +40,35 @@ from flask_restx import Api, Resource, fields
 
 
 class CouchbaseClient(object):
-    @classmethod
-    def create_client(_, *args, **kwargs):
-        self = CouchbaseClient(*args)
-        print("\n The application is initializing\n Please wait until it loads \n")
-        connected = self.ping()
-        if not connected:
-            self.connect(**kwargs)
-        return self
+    # @classmethod
+    # def create_client(_, *args, **kwargs):
+    #     self = CouchbaseClient(*args)
+    #     print("\n The application is initializing\n Please wait until it loads \n")
+    #     connected = self.ping()
+    #     if not connected:
+    #         self.connect(**kwargs)
+    #     return self
 
-    _instance = None
+    # _instance = None
 
-    def __new__(cls, host, bucket, scope, collection, username, pw):
-        if CouchbaseClient._instance is None:
-            CouchbaseClient._instance = object.__new__(cls)
-            CouchbaseClient._instance.host = host
-            CouchbaseClient._instance.bucket_name = bucket
-            CouchbaseClient._instance.collection_name = collection
-            CouchbaseClient._instance.scope_name = scope
-            CouchbaseClient._instance.username = username
-            CouchbaseClient._instance.password = pw
-        return CouchbaseClient._instance
+    # def __new__(cls, host, bucket, scope, collection, username, pw):
+    #     if CouchbaseClient._instance is None:
+    #         CouchbaseClient._instance = object.__new__(cls)
+    #         CouchbaseClient._instance.host = host
+    #         CouchbaseClient._instance.bucket_name = bucket
+    #         CouchbaseClient._instance.collection_name = collection
+    #         CouchbaseClient._instance.scope_name = scope
+    #         CouchbaseClient._instance.username = username
+    #         CouchbaseClient._instance.password = pw
+    #     return CouchbaseClient._instance
+
+    def __init__(self, host, bucket, scope, collection, username, pw):
+        self.host = host
+        self.bucket_name = bucket
+        self.collection_name = collection
+        self.scope_name = scope
+        self.username = username
+        self.password = pw
 
     def connect(self, **kwargs):
         # note: kwargs would be how one could pass in
@@ -373,6 +381,8 @@ db_info = {
 
 # print("Starting App")
 # cb = asyncio.run(db_operations(db_info))
-cb = CouchbaseClient.create_client(*db_info.values())
+# cb = CouchbaseClient.create_client(*db_info.values())
+cb = CouchbaseClient(*db_info.values())
+cb.connect()
 if __name__ == "__main__":
     app.run(debug=True)
