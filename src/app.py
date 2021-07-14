@@ -340,7 +340,7 @@ class Profiles(Resource):
     def get(self):
         try:
             # get vars from GET request
-            search = request.args.get("search")
+            search = request.args.get("search", "")
             limit = int(request.args.get("limit", 5))
             skip = int(request.args.get("skip", 0))
 

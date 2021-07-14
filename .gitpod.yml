@@ -8,11 +8,13 @@ tasks:
     command: curl -s 'https://da-demo-images.s3.amazonaws.com/runItNow_outline.png?couchbase-example=python-quickstart-repo&source=gitpod' > /dev/null
   - name: Start app
     init: cd src && python3 -m pip install -r requirements.txt
-    command: cd src && while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' -u Administrator:password localhost:8091/pools/default/buckets/)" != "200" ]]; do sleep 5; done && python3 db_init.py && flask run
+    command: cd src && while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' -u Administrator:password localhost:8091/pools/default/buckets/)" != "200" ]]; do sleep 5; done && python3 db_init.py && (flask run &) && sleep 1 && socat TCP-LISTEN:8080,fork TCP4:localhost:5000
 
 # exposed ports
 ports:
   - port: 5000
+    onOpen: ignore
+  - port: 8080
     onOpen: open-preview
   - port: 8091
     onOpen: open-browser
