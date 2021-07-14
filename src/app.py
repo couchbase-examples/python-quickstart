@@ -393,7 +393,7 @@ db_info = {
 
 
 if __name__ == "__main__":
-    app.run(debug=False, use_reloader=False)
+    app.run(debug=True)
 cb = CouchbaseClient(*db_info.values())
 cb.connect()
 # p = Process(target=db_operations, args=db_info)
