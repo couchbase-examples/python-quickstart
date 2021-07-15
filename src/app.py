@@ -16,8 +16,6 @@ import os
 from attr import validate
 import bcrypt
 from dotenv import load_dotenv
-import asyncio
-import time
 from multiprocessing import Process
 
 # setup couchbase
@@ -26,8 +24,6 @@ from couchbase.cluster import Cluster, ClusterOptions
 from couchbase.diagnostics import PingState
 from couchbase.exceptions import (
     CouchbaseException,
-    CollectionAlreadyExistsException,
-    BucketAlreadyExistsException,
     QueryIndexAlreadyExistsException,
     DocumentNotFoundException,
     DocumentExistsException,
@@ -41,28 +37,6 @@ from flask_restx import Api, Resource, fields
 
 
 class CouchbaseClient(object):
-    # @classmethod
-    # def create_client(_, *args, **kwargs):
-    #     self = CouchbaseClient(*args)
-    #     print("\n The application is initializing\n Please wait until it loads \n")
-    #     connected = self.ping()
-    #     if not connected:
-    #         self.connect(**kwargs)
-    #     return self
-
-    # _instance = None
-
-    # def __new__(cls, host, bucket, scope, collection, username, pw):
-    #     if CouchbaseClient._instance is None:
-    #         CouchbaseClient._instance = object.__new__(cls)
-    #         CouchbaseClient._instance.host = host
-    #         CouchbaseClient._instance.bucket_name = bucket
-    #         CouchbaseClient._instance.collection_name = collection
-    #         CouchbaseClient._instance.scope_name = scope
-    #         CouchbaseClient._instance.username = username
-    #         CouchbaseClient._instance.password = pw
-    #     return CouchbaseClient._instance
-
     def __init__(self, host, bucket, scope, collection, username, pw):
         self.host = host
         self.bucket_name = bucket
@@ -85,27 +59,7 @@ class CouchbaseClient(object):
             print(f"Could not connect to cluster. Error: {error}")
             raise
 
-        # try:
-        #     # create bucket if it doesn't exist
-        #     bucketSettings = BucketSettings(name=self.bucket_name, ram_quota_mb=256)
-        #     self._cluster.buckets().create_bucket(bucketSettings)
-        # except BucketAlreadyExistsException:
-        #     print("Bucket already exists")
-
         self._bucket = self._cluster.bucket(self.bucket_name)
-
-        # try:
-        #     # create collection if it doesn't exist
-        #     colSpec = CollectionSpec(self.collection_name, self.scope_name)
-        #     self._bucket.collections().create_collection(colSpec)
-        # except CollectionAlreadyExistsException:
-        #     print("Collection already exists")
-
-        # create index if it doesn't exist
-        # sleep to ensure that the bucket & collection creation operations are finished before trying to create the index
-        # print("\n The application is initializing\n Please wait until it loads \n")
-        # time.sleep(6)
-
         self._collection = self._bucket.collection(self.collection_name)
 
         try:
@@ -164,13 +118,8 @@ app = Flask(__name__)
 @app.route("/")
 def start_page():
     """Function to load the splash screen mainly for gitpod demo as the initialization takes time4"""
-    # print("Rendering Splash Screen")
-    # global cb
-    # cb = CouchbaseClient.create_client(*db_info.values())
     return render_template("splash_screen.html")
 
-
-# print("Initialize splash screen")
 
 api = Api(
     app,
@@ -373,29 +322,8 @@ db_info = {
     "password": os.getenv("PASSWORD"),
 }
 
-# cb = None
-# x = threading.Thread(CouchbaseClient.create_client, *db_info.values())
-# x.start()
-# async def db_operations(db_info):
-# cb = await CouchbaseClient.create_client(*db_info.values())
-# return cb
-# def db_operations(db_info):
-#     global cb
-#     cb = CouchbaseClient(*db_info.values())
-#     cb.connect()
-
-
-# print("Starting App")
-# cb = asyncio.run(db_operations(db_info))
-# cb = CouchbaseClient.create_client(*db_info.values())
-# cb = CouchbaseClient(*db_info.values())
-# cb.connect()
-
+cb = CouchbaseClient(*db_info.values())
+cb.connect()
 
 if __name__ == "__main__":
     app.run(debug=True)
-cb = CouchbaseClient(*db_info.values())
-cb.connect()
-# p = Process(target=db_operations, args=db_info)
-# p.start()
-# p.join()
