@@ -9,7 +9,6 @@ NOTE:  make sure to change into the src
 
 flask run
 """
-import time
 import uuid
 from codecs import decode
 from datetime import datetime
@@ -17,41 +16,34 @@ import os
 from attr import validate
 import bcrypt
 from dotenv import load_dotenv
+from multiprocessing import Process
 
 # setup couchbase
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster, ClusterOptions
 from couchbase.diagnostics import PingState
-from couchbase.exceptions import *
+from couchbase.exceptions import (
+    CouchbaseException,
+    QueryIndexAlreadyExistsException,
+    DocumentNotFoundException,
+    DocumentExistsException,
+)
 from couchbase.management.buckets import BucketSettings
 from couchbase.management.collections import CollectionSpec
 
 # setup flask
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_restx import Api, Resource, fields
 
 
 class CouchbaseClient(object):
-    @classmethod
-    def create_client(_, *args, **kwargs):
-        self = CouchbaseClient(*args)
-        connected = self.ping()
-        if not connected:
-            self.connect(**kwargs)
-        return self
-
-    _instance = None
-
-    def __new__(cls, host, bucket, scope, collection, username, pw):
-        if CouchbaseClient._instance is None:
-            CouchbaseClient._instance = object.__new__(cls)
-            CouchbaseClient._instance.host = host
-            CouchbaseClient._instance.bucket_name = bucket
-            CouchbaseClient._instance.collection_name = collection
-            CouchbaseClient._instance.scope_name = scope
-            CouchbaseClient._instance.username = username
-            CouchbaseClient._instance.password = pw
-        return CouchbaseClient._instance
+    def __init__(self, host, bucket, scope, collection, username, pw):
+        self.host = host
+        self.bucket_name = bucket
+        self.collection_name = collection
+        self.scope_name = scope
+        self.username = username
+        self.password = pw
 
     def connect(self, **kwargs):
         # note: kwargs would be how one could pass in
@@ -67,28 +59,9 @@ class CouchbaseClient(object):
             print(f"Could not connect to cluster. Error: {error}")
             raise
 
-        try:
-            # create bucket if it doesn't exist
-            bucketSettings = BucketSettings(name=self.bucket_name, ram_quota_mb=256)
-            self._cluster.buckets().create_bucket(bucketSettings)
-        except BucketAlreadyExistsException:
-            print("Bucket already exists")
-
         self._bucket = self._cluster.bucket(self.bucket_name)
-
-        try:
-            # create collection if it doesn't exist
-            colSpec = CollectionSpec(self.collection_name, self.scope_name)
-            self._bucket.collections().create_collection(colSpec)
-
-        except CollectionAlreadyExistsException:
-            print("Collection already exists")
-
         self._collection = self._bucket.collection(self.collection_name)
 
-        # create index if it doesn't exist
-        # sleep to ensure that the operations are finished before trying to create the index
-        time.sleep(6)
         try:
             # create index if it doesn't exist
             createIndexProfile = f"CREATE PRIMARY INDEX default_profile_index ON {self.bucket_name}.{self.scope_name}.{self.collection_name}"
@@ -140,11 +113,20 @@ class CouchbaseClient(object):
 
 # setup app and APIs using Flask
 app = Flask(__name__)
+
+
+@app.route("/")
+def start_page():
+    """Function to load the splash screen mainly for gitpod demo as the initialization takes time4"""
+    return render_template("splash_screen.html")
+
+
 api = Api(
     app,
     version="1.0",
     title="Python API Quickstart - Profile",
     description="Couchbase Quickstart API with Python, Flask, and Flask-RestX",
+    doc="/doc",
 )
 nsHealthCheck = api.namespace(
     "api/v1/healthcheck", description="Sanity check for unit tests"
@@ -307,7 +289,7 @@ class Profiles(Resource):
     def get(self):
         try:
             # get vars from GET request
-            search = request.args.get("search")
+            search = request.args.get("search", "")
             limit = int(request.args.get("limit", 5))
             skip = int(request.args.get("skip", 0))
 
@@ -315,7 +297,6 @@ class Profiles(Resource):
 
             # create query
             query = f"SELECT p.* FROM  {db_info['bucket']}.{db_info['scope']}.{db_info['collection']} p WHERE lower(p.firstName) LIKE $search_str OR lower(p.lastName) LIKE $search_str LIMIT $limit OFFSET $offset;"
-            print(query)
             res = cb.query(query, limit=limit, offset=skip, search_str=search_str)
 
             # must loop through results
@@ -331,8 +312,7 @@ class Profiles(Resource):
 
 
 load_dotenv()
-# done for example purposes only, some
-# sort of configuration should be used
+
 db_info = {
     "host": os.getenv("DB_HOST"),
     "bucket": os.getenv("BUCKET"),
@@ -342,7 +322,8 @@ db_info = {
     "password": os.getenv("PASSWORD"),
 }
 
-cb = CouchbaseClient.create_client(*db_info.values())
+cb = CouchbaseClient(*db_info.values())
+cb.connect()
 
 if __name__ == "__main__":
     app.run(debug=True)
