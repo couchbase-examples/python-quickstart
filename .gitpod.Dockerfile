@@ -15,8 +15,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive &&\
     apt-get update &&\ 
     export PATH="$PATH:/usr/local/bin" &&\
     export FLASK_APP=src/app &&\
-    export FLASK_ENV=development &&\
-    python3 -m pip install -r src/requirements.txt
+    export FLASK_ENV=development
 
 RUN addgroup --gid 33333 gitpod && \
     useradd --no-log-init --create-home --home-dir /home/gitpod --shell /bin/bash --uid 33333 --gid 33333 gitpod && \
@@ -24,4 +23,5 @@ RUN addgroup --gid 33333 gitpod && \
     echo 'gitpod ALL=(ALL) NOPASSWD:ALL'>> /etc/sudoers
 
 COPY startcb.sh /opt/couchbase/bin/startcb.sh
+# COPY src/requirements.txt requirements.txt
 USER gitpod
