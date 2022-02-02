@@ -13,9 +13,10 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive &&\
     apt-get install -y libssl-dev &&\
     apt-get install -y socat sudo &&\
     apt-get update &&\ 
-    export PATH="$PATH:/usr/local/bin:/home/gitpod/.local/bin" &&\
+    export PATH="$PATH:/usr/local/bin" &&\
     export FLASK_APP=src/app &&\
-    export FLASK_ENV=development
+    export FLASK_ENV=development &&\
+    python3 -m pip install -r src/requirements.txt
 
 RUN addgroup --gid 33333 gitpod && \
     useradd --no-log-init --create-home --home-dir /home/gitpod --shell /bin/bash --uid 33333 --gid 33333 gitpod && \
