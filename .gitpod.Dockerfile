@@ -23,5 +23,4 @@ RUN addgroup --gid 33333 gitpod && \
     echo 'gitpod ALL=(ALL) NOPASSWD:ALL'>> /etc/sudoers
 
 COPY startcb.sh /opt/couchbase/bin/startcb.sh
-# COPY src/requirements.txt requirements.txt
 USER gitpod
