@@ -24,3 +24,6 @@ RUN addgroup --gid 33333 gitpod && \
 
 COPY startcb.sh /opt/couchbase/bin/startcb.sh
 USER gitpod
+ENV PYTHONUSERBASE=/workspace/.pip-modules
+ENV PATH=$PYTHONUSERBASE/bin:$PATH
+ENV PIP_USER=yes
