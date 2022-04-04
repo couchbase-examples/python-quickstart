@@ -30,6 +30,8 @@ All configuration for communication with the database is stored in the `.env` fi
 
 There is an example file `.env.example` that can be used as the template for the pararmeters for your environment. You can copy this file and fill in with the values corresponding to your environment.
 
+Note: If you are running with [Couchbase Capella](https://cloud.couchbase.com/), you need to change the connection string to use the TLS (currently commented out). Also ensure that the buckets, scopes & collections exist on the cluster and your [IP address is whitelisted](https://docs.couchbase.com/cloud/get-started/cluster-and-data.html#allowed) on the Cluster.
+
 ## Running The Application
 
 At this point the application is ready and you can run it:
@@ -39,7 +41,7 @@ cd src
 flask run
 ```
 
-> \*Couchbase 7 must be installed and running on localhost (http://127.0.0.1:8091) prior to running the Flask Python app.
+> \*Couchbase 7 must be installed and running on localhost (http://127.0.0.1:8091) prior to running the Flask Python app unless running Couchbase Capella.
 
 ## Running The Tests
 

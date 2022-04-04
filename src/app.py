@@ -48,7 +48,13 @@ class CouchbaseClient(object):
     def connect(self, **kwargs):
         # note: kwargs would be how one could pass in
         #       more info for client config
+
         conn_str = f"couchbase://{self.host}"
+
+        # Note: To connect with Couchbase Capella, use the following conn_str instead of the one above as it needs TLS
+        # Also ensure that the bucket, scopes & collections are created on Capella before running the application
+
+        # conn_str = f"couchbases://{self.host}?ssl=no_verify"
 
         try:
             cluster_opts = ClusterOptions(
