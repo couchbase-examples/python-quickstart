@@ -37,14 +37,13 @@ from flask_restx import Api, Resource, fields
 
 
 class CouchbaseClient(object):
-    def __init__(self, host, bucket, scope, collection, username, pw, cert_path):
+    def __init__(self, host, bucket, scope, collection, username, pw):
         self.host = host
         self.bucket_name = bucket
         self.collection_name = collection
         self.scope_name = scope
         self.username = username
         self.password = pw
-        self.cert_path = cert_path
 
     def connect(self, **kwargs):
         # note: kwargs would be how one could pass in
@@ -52,24 +51,10 @@ class CouchbaseClient(object):
 
         conn_str = f"couchbase://{self.host}"
 
-        # Note: To connect with Couchbase Capella, use the following conn_str segment instead of the one above as it needs TLS
-        # Also ensure that the bucket, scopes & collections are created on Capella before running the application
-        # if self.cert_path:
-        #     conn_str = f"couchbases://{self.host}"
-        # else:
-        #     conn_str = f"couchbases://{self.host}?ssl=no_verify"
-
         try:
             cluster_opts = ClusterOptions(
                 authenticator=PasswordAuthenticator(self.username, self.password)
             )
-
-            # If connecting to Couchbase Capella with certificate, use the following ClusterOptions instead of the one above
-            # cluster_opts = ClusterOptions(
-            #     authenticator=PasswordAuthenticator(
-            #         self.username, self.password, cert_path=self.cert_path
-            #     )
-            # )
 
             self._cluster = Cluster(conn_str, options=cluster_opts, **kwargs)
         except CouchbaseException as error:
@@ -90,6 +75,41 @@ class CouchbaseClient(object):
             print("Index already exists")
         except Exception as e:
             print(f"Error: {e}")
+
+    # Note: To connect with Couchbase Capella, use the following connect() instead of the one above as it communicates with TLS.
+    # This example does not use certificates for authentication. In production, you should have it enabled.
+    # Also ensure that the bucket, scopes & collections are created on Capella before running the application.
+
+    # def connect(self, **kwargs):
+    #     # note: kwargs would be how one could pass in
+    #     #       more info for client config
+
+    #     conn_str = f"couchbases://{self.host}?ssl=no_verify"
+
+    #     try:
+    #         cluster_opts = ClusterOptions(
+    #             authenticator=PasswordAuthenticator(self.username, self.password)
+    #         )
+
+    #         self._cluster = Cluster(conn_str, options=cluster_opts, **kwargs)
+    #     except CouchbaseException as error:
+    #         print(f"Could not connect to cluster. Error: {error}")
+    #         raise
+
+    #     self._bucket = self._cluster.bucket(self.bucket_name)
+    #     self._collection = self._bucket.collection(self.collection_name)
+
+    #     try:
+    #         # create index if it doesn't exist
+    #         createIndexProfile = f"CREATE PRIMARY INDEX default_profile_index ON {self.bucket_name}.{self.scope_name}.{self.collection_name}"
+    #         createIndex = f"CREATE PRIMARY INDEX ON {self.bucket_name}"
+
+    #         self._bucket.query(createIndexProfile).execute()
+    #         self._bucket.query(createIndex).execute()
+    #     except QueryIndexAlreadyExistsException:
+    #         print("Index already exists")
+    #     except Exception as e:
+    #         print(f"Error: {e}")
 
     def ping(self):
         try:
@@ -337,7 +357,6 @@ db_info = {
     "collection": os.getenv("COLLECTION"),
     "username": os.getenv("USERNAME"),
     "password": os.getenv("PASSWORD"),
-    "cert_path": os.getenv("CERT_PATH"),
 }
 
 cb = CouchbaseClient(*db_info.values())
