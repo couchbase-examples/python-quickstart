@@ -30,7 +30,7 @@ All configuration for communication with the database is stored in the `.env` fi
 
 There is an example file `.env.example` that can be used as the template for the pararmeters for your environment. You can copy this file and fill in with the values corresponding to your environment.
 
-Note: If you are running with [Couchbase Capella](https://cloud.couchbase.com/), you need to change the connection string to use the TLS (currently commented out). Also ensure that the buckets, scopes & collections exist on the cluster and your [IP address is whitelisted](https://docs.couchbase.com/cloud/get-started/cluster-and-data.html#allowed) on the Cluster. If you want to use certificates, provide the path to the certificate in the environment variable, `CERT_PATH` and uncomment the ClusterOptions part of the code when connecting to the Cluster.
+Note: If you are running with [Couchbase Capella](https://cloud.couchbase.com/), you need to change the `connect()` method to use TLS (currently commented out). Also ensure that the buckets, scopes & collections exist on the cluster and your [IP address is whitelisted](https://docs.couchbase.com/cloud/get-started/cluster-and-data.html#allowed) on the Cluster. We do not use Certificates for authentication in this tutorial for simplicity. However for production use cases, it is recommended to enable Certificates.
 
 ## Running The Application
 
