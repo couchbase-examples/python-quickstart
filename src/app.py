@@ -78,7 +78,7 @@ class CouchbaseClient(object):
 
     # Note: To connect with Couchbase Capella, use the following connect() instead of the one above as it communicates with TLS.
     # This example does not use certificates for authentication. In production, you should have it enabled.
-    # Also ensure that the bucket, scopes & collections are created on Capella before running the application.
+    # Also ensure that the bucket is created on Capella before running the application.
 
     # def connect(self, **kwargs):
     #     # note: kwargs would be how one could pass in

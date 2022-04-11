@@ -38,6 +38,7 @@ At this point the application is ready and you can run it:
 
 ```sh
 cd src
+python db_init.py
 flask run
 ```
 
