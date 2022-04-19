@@ -1,0 +1,19 @@
+name: Tests
+on:
+  push:
+  schedule:
+    - cron: "0 11 * * 0"
+    
+jobs:
+  test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: |
+          sudo apt -y update
+          sudo apt -y install python3-pip
+          cd src
+          python -m pip install -r requirements.txt
+          pytest test.py
