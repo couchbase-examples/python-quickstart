@@ -41,9 +41,9 @@ def create_scope(cluster):
 
 
 def create_collection(cluster):
-    """Create the scope on the cluster using the SDK"""
+    """Create the collection on the cluster using the SDK"""
     try:
-        colSpec = CollectionSpec(collection, scope)
+        colSpec = CollectionSpec(collection, scope_name=scope)
         bkt = cluster.bucket(bucket)
         bkt.collections().create_collection(colSpec)
     except Exception as e:

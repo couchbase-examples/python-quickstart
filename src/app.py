@@ -62,7 +62,9 @@ class CouchbaseClient(object):
             raise
 
         self._bucket = self._cluster.bucket(self.bucket_name)
-        self._collection = self._bucket.collection(self.collection_name)
+        self._collection = self._bucket.scope(self.scope_name).collection(
+            self.collection_name
+        )
 
         try:
             # create index if it doesn't exist
@@ -97,7 +99,9 @@ class CouchbaseClient(object):
     #         raise
 
     #     self._bucket = self._cluster.bucket(self.bucket_name)
-    #     self._collection = self._bucket.collection(self.collection_name)
+    #     self._collection = self._bucket.scope(self.scope_name).collection(
+    #         self.collection_name
+    #     )
 
     #     try:
     #         # create index if it doesn't exist
