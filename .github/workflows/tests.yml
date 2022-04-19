@@ -1,6 +1,7 @@
 name: Tests
 on:
   push:
+  pull_request:
   schedule:
     - cron: "0 11 * * 0"
     
@@ -17,3 +18,14 @@ jobs:
           cd src
           python -m pip install -r requirements.txt
           pytest test.py
+      - name: Report Status
+        if: always()
+        uses: ravsamhq/notify-slack-action@v1
+        with:
+          status: ${{ job.status }}
+          notify_when: 'failure,warnings'
+          notification_title: 'Repo: *{repo}*'
+          message_format: '{emoji}    *{status_message}* in <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>'
+          footer: '<{run_url}|View Full Run on GitHub>'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
