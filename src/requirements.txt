@@ -7,3 +7,4 @@ python-dotenv==0.18.0
 bcrypt==3.2.0
 couchbase==3.2.7
 six==1.15.0
+MarkupSafe==2.0.1
