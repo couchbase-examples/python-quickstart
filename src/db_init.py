@@ -1,7 +1,6 @@
 import os
 import time
 
-import requests
 from couchbase.cluster import (
     Cluster,
     ClusterOptions,
