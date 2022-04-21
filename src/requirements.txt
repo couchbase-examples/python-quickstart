@@ -1,4 +1,4 @@
-flask_restx==0.4.0
+flask_restx==0.5.1
 attrs==21.4.0
 requests==2.25.1
 pytest==7.1.1
