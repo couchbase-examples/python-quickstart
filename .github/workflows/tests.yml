@@ -41,7 +41,7 @@ jobs:
           curl  -v -X POST http://localhost:8091/node/controller/setupServices -d 'services=kv%2Cn1ql%2Cindex'
           curl  -v -X POST http://localhost:8091/pools/default -d 'memoryQuota=256' -d 'indexMemoryQuota=256'
           curl  -u Administrator:password -v -X POST http://localhost:8091/settings/web -d 'password=password&username=Administrator&port=SAME'
-           curl -v -X POST http://localhost:8091/pools/default/buckets \
+          curl -v -X POST http://localhost:8091/pools/default/buckets \
             -u Administrator:password \
             -d name=user_profile \
             -d bucketType=couchbase\
@@ -57,7 +57,10 @@ jobs:
           cd src
           python -m pip install -r requirements.txt
       - name: Setup app
-        run: python db_init.py && flask run
+        run: |
+          cd src
+          python db_init.py
+          flask run
       - name: Run unit tests
         run: pytest test.py
       - name: Report Status
