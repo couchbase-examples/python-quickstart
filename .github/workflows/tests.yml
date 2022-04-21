@@ -62,7 +62,9 @@ jobs:
           python db_init.py
           flask run &
       - name: Run unit tests
-        run: pytest test.py
+        run: |
+          cd src
+          pytest test.py
       - name: Report Status
         if: always()
         uses: ravsamhq/notify-slack-action@v1
