@@ -13,7 +13,6 @@ import uuid
 from codecs import decode
 from datetime import datetime
 import os
-from attr import validate
 import bcrypt
 from dotenv import load_dotenv
 from multiprocessing import Process
