@@ -54,7 +54,7 @@ jobs:
       - name: Setup Python
         run: |
           sudo apt -y update
-          sudo apt -y install python3-pip
+          sudo apt -y install python3-pip python3-testresources
           cd src
           python -m pip install -r requirements.txt
       - name: Setup app
