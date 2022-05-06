@@ -63,7 +63,7 @@ jobs:
           python db_init.py
           export FLASK_ENV=development
           flask run &
-          sleep 1
+          sleep 10 && curl 'http://127.0.0.1:5000/api/v1/healthcheck/' -I &&
           pytest test.py
       # - name: Run unit tests
       #   run: |
