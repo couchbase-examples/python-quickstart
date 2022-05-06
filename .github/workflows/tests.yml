@@ -61,6 +61,7 @@ jobs:
         run: |
           cd src
           python db_init.py
+          export FLASK_ENV=development
           flask run &
       - name: Run unit tests
         run: |
