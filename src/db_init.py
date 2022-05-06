@@ -1,9 +1,14 @@
-import requests
 import os
-from dotenv import load_dotenv
 import time
-from requests.models import HTTPError
-from requests.auth import HTTPBasicAuth
+
+from couchbase.cluster import (
+    Cluster,
+    ClusterOptions,
+    PasswordAuthenticator,
+)
+from couchbase.management.collections import CollectionSpec
+from couchbase.management.buckets import BucketSettings
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -14,52 +19,80 @@ bucket = os.getenv("BUCKET")
 scope = os.getenv("SCOPE")
 collection = os.getenv("COLLECTION")
 
-auth = HTTPBasicAuth(f"{username}", f"{password}")
 
-
-def create_bucket():
-    """Create the bucket on the cluster using the REST API"""
-    result = requests.post(
-        url=f"http://{host}:8091/pools/default/buckets",
-        data={"name": bucket, "ramQuotaMB": 128},
-        auth=auth,
-    )
+def create_bucket(cluster):
+    """Create the bucket on the cluster using the SDK"""
     try:
-        result.raise_for_status()
-    except HTTPError as e:
-        print(f"Bucket may exist: {result.json()['errors']}")
+        # create bucket if it doesn't exist
+        bucketSettings = BucketSettings(name=bucket, ram_quota_mb=256)
+        cluster.buckets().create_bucket(bucketSettings)
+    except Exception as e:
+        print(f"Error: {e}")
 
 
-# def create_scope():
-#     """Create the bucket on the cluster using the REST API"""
-#     result = requests.post(
-#         url=f"http://{host}:8091/pools/default/buckets/{bucket}/scopes",
-#         data={"name": os.getenv("SCOPE")},
-#         auth=auth,
+def create_scope(cluster):
+    """Create the scope on the cluster using the SDK"""
+    try:
+        bkt = cluster.bucket(bucket)
+        bkt.collections().create_scope(scope)
+    except Exception as e:
+        print(f"NError: {e}")
+
+
+def create_collection(cluster):
+    """Create the collection on the cluster using the SDK"""
+    try:
+        colSpec = CollectionSpec(collection, scope_name=scope)
+        bkt = cluster.bucket(bucket)
+        bkt.collections().create_collection(colSpec)
+    except Exception as e:
+        print(f"MError: {e}")
+
+
+def initialize_db():
+    """Method to initialize Couchbase installed locally"""
+    # Connection String for Local Couchbase Installation
+    connection_str = "couchbase://" + host
+
+    print("Initializing DB")
+    cluster = Cluster(
+        connection_str,
+        ClusterOptions(PasswordAuthenticator(username, password)),
+    )
+
+    # Create Bucket
+    create_bucket(cluster)
+    time.sleep(5)
+
+    # Create Scope & Collection
+    create_scope(cluster)
+    create_collection(cluster)
+    time.sleep(5)
+
+    print("Initializing DB complete")
+
+
+# Use the following initialize_db() for Capella as it communicates with TLS.
+# This example does not use certificates for authentication. In production, you should have it enabled.
+# Also ensure that the bucket is created on Capella before running the application.
+# def initialize_db():
+#     """Method to initialize Couchbase using Capella"""
+#     # Connection String for Couchbase Capella
+#     connection_str = "couchbases://" + host + "?ssl=no_verify"
+
+#     print("Initializing DB")
+#     cluster = Cluster(
+#         connection_str,
+#         ClusterOptions(PasswordAuthenticator(username, password)),
 #     )
-#     print(result, result.status_code, result.json())
-#     try:
-#         result.raise_for_status()
-#     except HTTPError as e:
-#         print(f"Error: {result.json()['errors']}")
+
+#     # Create Scope & Collection
+#     create_scope(cluster)
+#     create_collection(cluster)
+#     time.sleep(5)
+
+#     print("Initializing DB complete")
 
 
-def create_collection():
-    """Create the bucket on the cluster using the REST API"""
-    result = requests.post(
-        url=f"http://{host}:8091/pools/default/buckets/{bucket}/scopes/{scope}/collections",
-        data={"name": collection},
-        auth=auth,
-    )
-    try:
-        result.raise_for_status()
-    except HTTPError as e:
-        print(f"Collection may exist: {result.json()['errors']}")
-
-
-print("Initializing DB")
-create_bucket()
-time.sleep(5)
-create_collection()
-time.sleep(5)
-print("Initializing DB complete")
+if __name__ == "__main__":
+    initialize_db()

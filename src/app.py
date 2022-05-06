@@ -13,7 +13,6 @@ import uuid
 from codecs import decode
 from datetime import datetime
 import os
-from attr import validate
 import bcrypt
 from dotenv import load_dotenv
 from multiprocessing import Process
@@ -48,19 +47,23 @@ class CouchbaseClient(object):
     def connect(self, **kwargs):
         # note: kwargs would be how one could pass in
         #       more info for client config
+
         conn_str = f"couchbase://{self.host}"
 
         try:
             cluster_opts = ClusterOptions(
                 authenticator=PasswordAuthenticator(self.username, self.password)
             )
+
             self._cluster = Cluster(conn_str, options=cluster_opts, **kwargs)
         except CouchbaseException as error:
             print(f"Could not connect to cluster. Error: {error}")
             raise
 
         self._bucket = self._cluster.bucket(self.bucket_name)
-        self._collection = self._bucket.collection(self.collection_name)
+        self._collection = self._bucket.scope(self.scope_name).collection(
+            self.collection_name
+        )
 
         try:
             # create index if it doesn't exist
@@ -73,6 +76,43 @@ class CouchbaseClient(object):
             print("Index already exists")
         except Exception as e:
             print(f"Error: {e}")
+
+    # Note: To connect with Couchbase Capella, use the following connect() instead of the one above as it communicates with TLS.
+    # This example does not use certificates for authentication. In production, you should have it enabled.
+    # Also ensure that the bucket is created on Capella before running the application.
+
+    # def connect(self, **kwargs):
+    #     # note: kwargs would be how one could pass in
+    #     #       more info for client config
+
+    #     conn_str = f"couchbases://{self.host}?ssl=no_verify"
+
+    #     try:
+    #         cluster_opts = ClusterOptions(
+    #             authenticator=PasswordAuthenticator(self.username, self.password)
+    #         )
+
+    #         self._cluster = Cluster(conn_str, options=cluster_opts, **kwargs)
+    #     except CouchbaseException as error:
+    #         print(f"Could not connect to cluster. Error: {error}")
+    #         raise
+
+    #     self._bucket = self._cluster.bucket(self.bucket_name)
+    #     self._collection = self._bucket.scope(self.scope_name).collection(
+    #         self.collection_name
+    #     )
+
+    #     try:
+    #         # create index if it doesn't exist
+    #         createIndexProfile = f"CREATE PRIMARY INDEX default_profile_index ON {self.bucket_name}.{self.scope_name}.{self.collection_name}"
+    #         createIndex = f"CREATE PRIMARY INDEX ON {self.bucket_name}"
+
+    #         self._bucket.query(createIndexProfile).execute()
+    #         self._bucket.query(createIndex).execute()
+    #     except QueryIndexAlreadyExistsException:
+    #         print("Index already exists")
+    #     except Exception as e:
+    #         print(f"Error: {e}")
 
     def ping(self):
         try:

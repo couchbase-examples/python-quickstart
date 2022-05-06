@@ -30,16 +30,20 @@ All configuration for communication with the database is stored in the `.env` fi
 
 There is an example file `.env.example` that can be used as the template for the pararmeters for your environment. You can copy this file and fill in with the values corresponding to your environment.
 
+Note: If you are running with [Couchbase Capella](https://cloud.couchbase.com/), you need to change the `connect()` method to use TLS (currently commented out). Also ensure that the bucket exists on the cluster and your [IP address is whitelisted](https://docs.couchbase.com/cloud/get-started/cluster-and-data.html#allowed) on the Cluster. We do not use Certificates for authentication in this tutorial for simplicity. However for production use cases, it is recommended to enable Certificates.
+
+In order to initialize the scope and collection in the Capella cluster, you need to change the `initialize_db()` in `db_init.py` to use TLS (currently commented out).
+
 ## Running The Application
 
-At this point the application is ready and you can run it:
+At this point the application is ready and you can run it. The bucket along with the scope and collection will be created on the cluster. For Capella, you need to ensure that the bucket is created before running the application.
 
 ```sh
 cd src
-flask run
+python db_init.py && flask run
 ```
 
-> \*Couchbase 7 must be installed and running on localhost (http://127.0.0.1:8091) prior to running the Flask Python app.
+> \*Couchbase 7 must be installed and running on localhost (http://127.0.0.1:8091) prior to running the Flask Python app unless running Couchbase Capella.
 
 ## Running The Tests
 
