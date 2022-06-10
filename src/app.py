@@ -19,7 +19,8 @@ from multiprocessing import Process
 
 # setup couchbase
 from couchbase.auth import PasswordAuthenticator
-from couchbase.cluster import Cluster, ClusterOptions
+from couchbase.cluster import Cluster
+from couchbase.options import ClusterOptions
 from couchbase.diagnostics import PingState
 from couchbase.exceptions import (
     CouchbaseException,
@@ -55,7 +56,7 @@ class CouchbaseClient(object):
                 authenticator=PasswordAuthenticator(self.username, self.password)
             )
 
-            self._cluster = Cluster(conn_str, options=cluster_opts, **kwargs)
+            self._cluster = Cluster(conn_str, cluster_opts, **kwargs)
         except CouchbaseException as error:
             print(f"Could not connect to cluster. Error: {error}")
             raise
@@ -70,8 +71,8 @@ class CouchbaseClient(object):
             createIndexProfile = f"CREATE PRIMARY INDEX default_profile_index ON {self.bucket_name}.{self.scope_name}.{self.collection_name}"
             createIndex = f"CREATE PRIMARY INDEX ON {self.bucket_name}"
 
-            self._bucket.query(createIndexProfile).execute()
-            self._bucket.query(createIndex).execute()
+            self._cluster.query(createIndexProfile).execute()
+            self._cluster.query(createIndex).execute()
         except QueryIndexAlreadyExistsException:
             print("Index already exists")
         except Exception as e:

@@ -1,11 +1,9 @@
 import os
 import time
 
-from couchbase.cluster import (
-    Cluster,
-    ClusterOptions,
-    PasswordAuthenticator,
-)
+from couchbase.cluster import Cluster
+from couchbase.options import ClusterOptions
+from couchbase.auth import PasswordAuthenticator
 from couchbase.management.collections import CollectionSpec
 from couchbase.management.buckets import BucketSettings
 from dotenv import load_dotenv
