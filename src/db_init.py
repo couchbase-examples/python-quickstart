@@ -1,11 +1,13 @@
 import os
 import time
 
-from couchbase.cluster import Cluster
-from couchbase.options import ClusterOptions
+# couchbase imports
 from couchbase.auth import PasswordAuthenticator
-from couchbase.management.collections import CollectionSpec
+from couchbase.cluster import Cluster
+from couchbase.exceptions import CouchbaseException
 from couchbase.management.buckets import BucketSettings
+from couchbase.management.collections import CollectionSpec
+from couchbase.options import ClusterOptions
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,6 +26,8 @@ def create_bucket(cluster):
         # create bucket if it doesn't exist
         bucketSettings = BucketSettings(name=bucket, ram_quota_mb=256)
         cluster.buckets().create_bucket(bucketSettings)
+    except CouchbaseException as e:
+        print("Bucket already exists")
     except Exception as e:
         print(f"Error: {e}")
 
@@ -33,8 +37,10 @@ def create_scope(cluster):
     try:
         bkt = cluster.bucket(bucket)
         bkt.collections().create_scope(scope)
+    except CouchbaseException as e:
+        print("Scope already exists")
     except Exception as e:
-        print(f"NError: {e}")
+        print(f"Error: {e}")
 
 
 def create_collection(cluster):
@@ -43,8 +49,10 @@ def create_collection(cluster):
         colSpec = CollectionSpec(collection, scope_name=scope)
         bkt = cluster.bucket(bucket)
         bkt.collections().create_collection(colSpec)
+    except CouchbaseException as e:
+        print("Collection already exists")
     except Exception as e:
-        print(f"MError: {e}")
+        print(f"Error: {e}")
 
 
 def initialize_db():
@@ -71,12 +79,12 @@ def initialize_db():
 
 
 # Use the following initialize_db() for Capella as it communicates with TLS.
-# This example does not use certificates for authentication. In production, you should have it enabled.
 # Also ensure that the bucket is created on Capella before running the application.
+
 # def initialize_db():
 #     """Method to initialize Couchbase using Capella"""
 #     # Connection String for Couchbase Capella
-#     connection_str = "couchbases://" + host + "?ssl=no_verify"
+#     connection_str = "couchbases://" + host
 
 #     print("Initializing DB")
 #     cluster = Cluster(

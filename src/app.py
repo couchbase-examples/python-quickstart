@@ -6,33 +6,30 @@ export FLASK_ENV=development
 
 NOTE:  make sure to change into the src 
     directory before running flask
-
-flask run
+python db_init,py && flask run
 """
+import os
 import uuid
 from codecs import decode
 from datetime import datetime
-import os
-import bcrypt
-from dotenv import load_dotenv
 from multiprocessing import Process
+
+import bcrypt
 
 # setup couchbase
 from couchbase.auth import PasswordAuthenticator
 from couchbase.cluster import Cluster
-from couchbase.options import ClusterOptions
 from couchbase.diagnostics import PingState
 from couchbase.exceptions import (
     CouchbaseException,
-    QueryIndexAlreadyExistsException,
-    DocumentNotFoundException,
     DocumentExistsException,
+    DocumentNotFoundException,
 )
-from couchbase.management.buckets import BucketSettings
-from couchbase.management.collections import CollectionSpec
+from couchbase.options import ClusterOptions
+from dotenv import load_dotenv
 
 # setup flask
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, render_template, request
 from flask_restx import Api, Resource, fields
 
 
@@ -73,27 +70,26 @@ class CouchbaseClient(object):
 
             self._cluster.query(createIndexProfile).execute()
             self._cluster.query(createIndex).execute()
-        except QueryIndexAlreadyExistsException:
+        except CouchbaseException as e:
             print("Index already exists")
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Error: {type(e)}{e}")
 
     # Note: To connect with Couchbase Capella, use the following connect() instead of the one above as it communicates with TLS.
-    # This example does not use certificates for authentication. In production, you should have it enabled.
     # Also ensure that the bucket is created on Capella before running the application.
 
     # def connect(self, **kwargs):
     #     # note: kwargs would be how one could pass in
     #     #       more info for client config
 
-    #     conn_str = f"couchbases://{self.host}?ssl=no_verify"
+    #     conn_str = f"couchbases://{self.host}"
 
     #     try:
     #         cluster_opts = ClusterOptions(
     #             authenticator=PasswordAuthenticator(self.username, self.password)
     #         )
 
-    #         self._cluster = Cluster(conn_str, options=cluster_opts, **kwargs)
+    #         self._cluster = Cluster(conn_str, cluster_opts, **kwargs)
     #     except CouchbaseException as error:
     #         print(f"Could not connect to cluster. Error: {error}")
     #         raise
@@ -108,9 +104,9 @@ class CouchbaseClient(object):
     #         createIndexProfile = f"CREATE PRIMARY INDEX default_profile_index ON {self.bucket_name}.{self.scope_name}.{self.collection_name}"
     #         createIndex = f"CREATE PRIMARY INDEX ON {self.bucket_name}"
 
-    #         self._bucket.query(createIndexProfile).execute()
-    #         self._bucket.query(createIndex).execute()
-    #     except QueryIndexAlreadyExistsException:
+    #         self._cluster.query(createIndexProfile).execute()
+    #         self._cluster.query(createIndex).execute()
+    #     except CouchbaseException as e:
     #         print("Index already exists")
     #     except Exception as e:
     #         print(f"Error: {e}")
