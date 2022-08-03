@@ -1,6 +1,6 @@
 # Quickstart in Couchbase with Flask and Python
 
-#### Build a REST API with Couchbase's Python SDK 3 and Flask
+#### Build a REST API with Couchbase's Python SDK 4 and Flask
 
 > This repo is designed to teach you how to connect to a Couchbase cluster to create, read, update, and delete documents and how to write simple parametrized N1QL queries.
 
