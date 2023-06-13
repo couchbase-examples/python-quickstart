@@ -50,7 +50,7 @@ jobs:
             -d durabilityMinLevel=majorityAndPersistActive
           curl  -u Administrator:password -v -X POST http://localhost:8091/settings/indexes -d 'storageMode=memory_optimized'
           curl  -u Administrator:password -v -X GET http://localhost:8091/pools/default | jq '.' | grep hostname
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup Python
         run: |
           sudo apt -y update
