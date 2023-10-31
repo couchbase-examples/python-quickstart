@@ -1,5 +1,5 @@
 from flask_restx import Namespace, fields, Resource
-from flask import request, jsonify
+from flask import request
 from extensions import couchbase_db
 from couchbase.exceptions import (
     CouchbaseException,
@@ -14,12 +14,10 @@ airport_ns = Namespace("Airport", description="Airport related APIs", ordered=Tr
 airport_model = airport_ns.model(
     "Airport",
     {
-        "id": fields.Integer(required=True, description="Airport ID", example=1273),
-        "type": fields.String(
-            description="Document Type", default="airport", example="Sample Airport"
+        "airportname": fields.String(
+            required=True, description="Airport Name", example="Sample Airport"
         ),
-        "airportname": fields.String(required=True, description="Airport Name"),
-        "city": fields.String(required=True, description="City"),
+        "city": fields.String(required=True, description="City", example="Sample City"),
         "country": fields.String(required=True, description="Country"),
         "faa": fields.String(required=True, description="FAA code"),
         "icao": fields.String(description="ICAO code"),
@@ -31,8 +29,9 @@ airport_model = airport_ns.model(
 )
 
 
-@airport_ns.route("")
-class Airport(Resource):
+@airport_ns.route("/<id>")
+@airport_ns.doc(params={"id": "Airport ID like airport_1273"})
+class AirportId(Resource):
     @airport_ns.doc(
         description="Create Airport",
         responses={
@@ -42,22 +41,16 @@ class Airport(Resource):
         },
     )
     @airport_ns.expect(airport_model, validate=True)
-    def post(self):
+    def post(self, id):
         try:
             data = request.json
-            couchbase_db.insert_document(
-                AIRPORT_COLLECTION, key=f"{AIRPORT_COLLECTION}_{data['id']}", doc=data
-            )
+            couchbase_db.insert_document(AIRPORT_COLLECTION, key=id, doc=data)
             return data, 201
         except DocumentExistsException as e:
             return "Airport already exists", 409
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500
 
-
-@airport_ns.route("/<int:id>")
-@airport_ns.doc(params={"id": "Airport ID"})
-class AirportId(Resource):
     @airport_ns.doc(
         description="Get Airport",
         responses={
@@ -66,12 +59,11 @@ class AirportId(Resource):
             500: "Unexpected Error",
         },
     )
+    @airport_ns.marshal_with(airport_model, skip_none=True)
     def get(self, id):
         try:
-            result = couchbase_db.get_document(
-                AIRPORT_COLLECTION, key=f"{AIRPORT_COLLECTION}_{id}"
-            )
-            return jsonify(result.content_as[dict])
+            result = couchbase_db.get_document(AIRPORT_COLLECTION, key=id)
+            return result.content_as[dict]
         except DocumentNotFoundException as e:
             return "Airport not found", 404
         except (CouchbaseException, Exception) as e:
@@ -88,9 +80,7 @@ class AirportId(Resource):
     def put(self, id):
         try:
             updated_doc = request.json
-            couchbase_db.upsert_document(
-                AIRPORT_COLLECTION, key=f"{AIRPORT_COLLECTION}_{id}", doc=updated_doc
-            )
+            couchbase_db.upsert_document(AIRPORT_COLLECTION, key=id, doc=updated_doc)
             return updated_doc
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500
@@ -105,9 +95,7 @@ class AirportId(Resource):
     )
     def delete(self, id):
         try:
-            couchbase_db.delete_document(
-                AIRPORT_COLLECTION, key=f"{AIRPORT_COLLECTION}_{id}"
-            )
+            couchbase_db.delete_document(AIRPORT_COLLECTION, key=id)
             return "Deleted", 204
         except DocumentNotFoundException:
             return "Airport not found", 404
@@ -136,6 +124,7 @@ class AirportId(Resource):
     },
 )
 class AirportList(Resource):
+    @airport_ns.marshal_list_with(airport_model)
     def get(self):
         country = request.args.get("country", "")
         limit = int(request.args.get("limit", 5))
@@ -149,7 +138,6 @@ class AirportList(Resource):
                     airport.faa,
                     airport.geo,
                     airport.icao,
-                    airport.id,
                     airport.tz
                 FROM airport AS airport
                 WHERE airport.country = $country
@@ -162,7 +150,7 @@ class AirportList(Resource):
                 query, country=country, limit=limit, offset=offset
             )
             airports = [r for r in results]
-            return jsonify(airports)
+            return airports
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500
 
@@ -204,6 +192,7 @@ class DirectConnections(Resource):
                 FROM airport as airport
                 JOIN route as route on route.sourceairport = airport.faa
                 WHERE airport.faa = $airport and route.stops = 0
+                ORDER BY route.destinationairport
                 LIMIT $limit
                 OFFSET $offset
             """
@@ -211,6 +200,6 @@ class DirectConnections(Resource):
                 query, airport=airport, limit=limit, offset=offset
             )
             airports = [r for r in result]
-            return jsonify(airports)
+            return airports
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500

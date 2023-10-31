@@ -1,5 +1,5 @@
 from flask_restx import Namespace, fields, Resource
-from flask import request, jsonify
+from flask import request
 from extensions import couchbase_db
 from couchbase.exceptions import (
     CouchbaseException,
@@ -14,11 +14,9 @@ airline_ns = Namespace("Airline", description="Airline related APIs", ordered=Tr
 airline_model = airline_ns.model(
     "Airline",
     {
-        "id": fields.Integer(required=True, description="Airline ID", example=10),
         "name": fields.String(
             required=True, description="Airline Name", example="Sample Airline"
         ),
-        "type": fields.String(description="Document Type", default="airline"),
         "iato": fields.String(description="IATA code"),
         "icao": fields.String(description="ICAO code"),
         "callsign": fields.String(required=True, description="Callsign"),
@@ -27,8 +25,9 @@ airline_model = airline_ns.model(
 )
 
 
-@airline_ns.route("")
-class Airline(Resource):
+@airline_ns.route("/<id>")
+@airline_ns.doc(params={"id": "Airline ID like airline_10"})
+class AirlineId(Resource):
     @airline_ns.doc(
         description="Create Airline",
         responses={
@@ -38,22 +37,16 @@ class Airline(Resource):
         },
     )
     @airline_ns.expect(airline_model, validate=True)
-    def post(self):
+    def post(self, id):
         try:
             data = request.json
-            couchbase_db.insert_document(
-                AIRLINE_COLLECTION, key=f"{AIRLINE_COLLECTION}_{data['id']}", doc=data
-            )
+            couchbase_db.insert_document(AIRLINE_COLLECTION, key=id, doc=data)
             return data, 201
         except DocumentExistsException as e:
             return "Airline already exists", 409
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500
 
-
-@airline_ns.route("/<int:id>")
-@airline_ns.doc(params={"id": "Airline ID"})
-class AirlineId(Resource):
     @airline_ns.doc(
         description="Get Airline",
         responses={
@@ -62,12 +55,11 @@ class AirlineId(Resource):
             500: "Unexpected Error",
         },
     )
+    @airline_ns.marshal_with(airline_model, skip_none=True)
     def get(self, id):
         try:
-            result = couchbase_db.get_document(
-                AIRLINE_COLLECTION, key=f"{AIRLINE_COLLECTION}_{id}"
-            )
-            return jsonify(result.content_as[dict])
+            result = couchbase_db.get_document(AIRLINE_COLLECTION, key=id)
+            return result.content_as[dict]
         except DocumentNotFoundException as e:
             return "Airline not found", 404
         except (CouchbaseException, Exception) as e:
@@ -84,9 +76,7 @@ class AirlineId(Resource):
     def put(self, id):
         try:
             updated_doc = request.json
-            couchbase_db.upsert_document(
-                AIRLINE_COLLECTION, key=f"{AIRLINE_COLLECTION}_{id}", doc=updated_doc
-            )
+            couchbase_db.upsert_document(AIRLINE_COLLECTION, key=id, doc=updated_doc)
             return updated_doc
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500
@@ -101,9 +91,7 @@ class AirlineId(Resource):
     )
     def delete(self, id):
         try:
-            couchbase_db.delete_document(
-                AIRLINE_COLLECTION, key=f"{AIRLINE_COLLECTION}_{id}"
-            )
+            couchbase_db.delete_document(AIRLINE_COLLECTION, key=id)
             return "Deleted", 204
         except DocumentNotFoundException:
             return "Airline not found", 404
@@ -137,6 +125,7 @@ class AirlineId(Resource):
     },
 )
 class AirlineList(Resource):
+    @airline_ns.marshal_list_with(airline_model)
     def get(self):
         country = request.args.get("country", "")
         limit = int(request.args.get("limit", 10))
@@ -148,16 +137,18 @@ class AirlineList(Resource):
                     airline.country,
                     airline.iata,
                     airline.icao,
-                    airline.id,
-                    airline.name,
-                    airline.type
-                FROM airline as airline where airline.country=$country LIMIT $limit OFFSET $offset;
+                    airline.name
+                FROM airline as airline 
+                WHERE airline.country=$country 
+                ORDER BY airline.name
+                LIMIT $limit 
+                OFFSET $offset;
             """
             result = couchbase_db.query(
                 query, country=country, limit=limit, offset=offset
             )
             airlines = [r for r in result]
-            return jsonify(airlines)
+            return airlines
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500
 
@@ -188,6 +179,7 @@ class AirlineList(Resource):
     },
 )
 class AirlinesToAirport(Resource):
+    @airline_ns.marshal_list_with(airline_model)
     def get(self):
         airport = request.args.get("airport", "")
         limit = int(request.args.get("limit", 10))
@@ -198,7 +190,6 @@ class AirlinesToAirport(Resource):
                     air.country,
                     air.iata,
                     air.icao,
-                    air.id,
                     air.name
                 FROM (
                     SELECT DISTINCT META(airline).id AS airlineId
@@ -207,12 +198,13 @@ class AirlinesToAirport(Resource):
                     WHERE route.destinationairport = $airport
                 ) AS subquery
                 JOIN airline AS air ON META(air).id = subquery.airlineId
+                ORDER BY air.name
                 LIMIT $limit OFFSET $offset;
             """
             result = couchbase_db.query(
                 query, airport=airport, limit=limit, offset=offset
             )
             airports = [r for r in result]
-            return jsonify(airports)
+            return airports
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500

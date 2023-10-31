@@ -1,5 +1,5 @@
 from flask_restx import Namespace, fields, Resource
-from flask import request, jsonify
+from flask import request
 from extensions import couchbase_db
 from couchbase.exceptions import (
     CouchbaseException,
@@ -22,8 +22,6 @@ schedule_fields = route_ns.model(
 route_model = route_ns.model(
     "Route",
     {
-        "id": fields.Integer(required=True, description="Route ID", example=10),
-        "type": fields.String(description="Document Type", default="route"),
         "airline": fields.String(required=True, description="Airline", example="AF"),
         "airline_id": fields.String(
             required=True, description="Airline ID", example="airline_10"
@@ -42,8 +40,9 @@ route_model = route_ns.model(
 )
 
 
-@route_ns.route("/")
-class Route(Resource):
+@route_ns.route("/<id>")
+@route_ns.doc(params={"id": "Route ID like route_10000"})
+class RouteId(Resource):
     @route_ns.doc(
         description="Create Route",
         responses={
@@ -53,22 +52,16 @@ class Route(Resource):
         },
     )
     @route_ns.expect(route_model, validate=True)
-    def post(self):
+    def post(self, id):
         try:
             data = request.json
-            couchbase_db.insert_document(
-                ROUTE_COLLECTION, key=f"{ROUTE_COLLECTION}_{data['id']}", doc=data
-            )
+            couchbase_db.insert_document(ROUTE_COLLECTION, key=id, doc=data)
             return data, 201
         except DocumentExistsException as e:
             return "Route already exists", 409
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500
 
-
-@route_ns.route("/<int:id>")
-@route_ns.doc(params={"id": "Route ID"})
-class RouteId(Resource):
     @route_ns.doc(
         description="Get Route",
         responses={
@@ -77,12 +70,11 @@ class RouteId(Resource):
             500: "Unexpected Error",
         },
     )
+    @route_ns.marshal_with(route_model, skip_none=True)
     def get(self, id):
         try:
-            result = couchbase_db.get_document(
-                ROUTE_COLLECTION, key=f"{ROUTE_COLLECTION}_{id}"
-            )
-            return jsonify(result.content_as[dict])
+            result = couchbase_db.get_document(ROUTE_COLLECTION, key=id)
+            return result.content_as[dict]
         except DocumentNotFoundException:
             return "Route not found", 404
         except (CouchbaseException, Exception) as e:
@@ -99,9 +91,7 @@ class RouteId(Resource):
     def put(self, id):
         try:
             updated_doc = request.json
-            couchbase_db.upsert_document(
-                ROUTE_COLLECTION, key=f"{ROUTE_COLLECTION}_{id}", doc=updated_doc
-            )
+            couchbase_db.upsert_document(ROUTE_COLLECTION, key=id, doc=updated_doc)
             return updated_doc
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500
@@ -116,9 +106,7 @@ class RouteId(Resource):
     )
     def delete(self, id):
         try:
-            couchbase_db.delete_document(
-                ROUTE_COLLECTION, key=f"{ROUTE_COLLECTION}_{id}"
-            )
+            couchbase_db.delete_document(ROUTE_COLLECTION, key=id)
             return "Deleted", 204
         except DocumentNotFoundException:
             return "Route not found", 404
