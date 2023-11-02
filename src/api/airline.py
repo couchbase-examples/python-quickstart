@@ -130,7 +130,7 @@ class AirlineList(Resource):
         country = request.args.get("country", "")
         limit = int(request.args.get("limit", 10))
         offset = int(request.args.get("offset", 0))
-        print(country, limit, offset)
+
         try:
             query = """
                 SELECT airline.callsign,
@@ -199,7 +199,8 @@ class AirlinesToAirport(Resource):
                 ) AS subquery
                 JOIN airline AS air ON META(air).id = subquery.airlineId
                 ORDER BY air.name
-                LIMIT $limit OFFSET $offset;
+                LIMIT $limit 
+                OFFSET $offset;
             """
             result = couchbase_db.query(
                 query, airport=airport, limit=limit, offset=offset

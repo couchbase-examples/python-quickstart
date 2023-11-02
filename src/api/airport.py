@@ -92,7 +92,7 @@ class AirportId(Resource):
             500: "Unexpected Error",
         },
     )
-    @airport_ns.expect(airport_model)
+    @airport_ns.expect(airport_model, validate=True)
     def put(self, id):
         try:
             updated_doc = request.json
@@ -143,7 +143,7 @@ class AirportList(Resource):
     @airport_ns.marshal_list_with(airport_model)
     def get(self):
         country = request.args.get("country", "")
-        limit = int(request.args.get("limit", 5))
+        limit = int(request.args.get("limit", 10))
         offset = int(request.args.get("offset", 0))
 
         try:
