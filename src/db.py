@@ -41,15 +41,19 @@ class CouchbaseClient(object):
 
                 # wait until the cluster is ready for use
                 self.cluster.wait_until_ready(timedelta(seconds=5))
-            except CouchbaseException as error:
-                print(f"Could not connect to cluster. Error: {error}")
-                raise
 
-            # get a reference to our bucket
-            self.bucket = self.cluster.bucket(self.bucket_name)
+                # get a reference to our bucket
+                self.bucket = self.cluster.bucket(self.bucket_name)
+            except CouchbaseException as error:
+                print(f"Could not connect to cluster. \nError: {error}")
+                print(
+                    "Ensure that you have the travel-sample bucket loaded in the cluster."
+                )
+                exit()
+
             if not self.check_scope_exists():
                 print(
-                    "Inventory scope does not exist in the bucket. Ensure that you have the travel-sample bucket loaded in the cluster."
+                    "Inventory scope does not exist in the bucket. \nEnsure that you have the inventory scope in your travel-sample bucket."
                 )
                 exit()
 
@@ -65,9 +69,9 @@ class CouchbaseClient(object):
             return self.scope_name in scopes_in_bucket
         except Exception as e:
             print(
-                "Error fetching scopes in cluster. Ensure that travel-sample bucket exists."
+                "Error fetching scopes in cluster. \nEnsure that travel-sample bucket exists."
             )
-            raise
+            exit()
 
     def get_document(self, collection_name: str, key: str):
         """Get document by key using KV operation"""
