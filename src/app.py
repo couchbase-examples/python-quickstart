@@ -12,7 +12,7 @@ app = Flask(__name__)
 api = Api(
     title="Python Quickstart using Flask",
     version="1.0",
-    description="A quickstart API using Python with Couchbase, Flask & travel sample data",
+    description="A quickstart API using Python with Couchbase, Flask & travel-sample data",
 )
 api.init_app(app)
 

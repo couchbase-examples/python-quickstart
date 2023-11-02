@@ -11,6 +11,24 @@ AIRPORT_COLLECTION = "airport"
 
 airport_ns = Namespace("Airport", description="Airport related APIs", ordered=True)
 
+geo_cordinate_fields = airport_ns.model(
+    "Geo Coordinates",
+    {
+        "lat": fields.Float(
+            description="Latitude",
+            example=48.864716,
+        ),
+        "lon": fields.Float(
+            description="Longitude",
+            example=2.349014,
+        ),
+        "alt": fields.Float(
+            description="Altitude",
+            example=92.0,
+        ),
+    },
+)
+
 airport_model = airport_ns.model(
     "Airport",
     {
@@ -22,9 +40,7 @@ airport_model = airport_ns.model(
         "faa": fields.String(required=True, description="FAA code"),
         "icao": fields.String(description="ICAO code"),
         "tz": fields.String(description="Timezone", example="Europe/Paris"),
-        "geo.lat": fields.Float(description="Latitude"),
-        "geo.lon": fields.Float(description="Longitude"),
-        "geo.alt": fields.Float(description="Altitude"),
+        "geo": fields.Nested(geo_cordinate_fields),
     },
 )
 
@@ -155,6 +171,16 @@ class AirportList(Resource):
             return f"Unexpected error: {e}", 500
 
 
+destination_airports_model = airport_ns.model(
+    "Direct Connections",
+    {
+        "destinationairport": fields.String(
+            required=True, description="Airport FAA Code", example="JFK"
+        ),
+    },
+)
+
+
 @airport_ns.route("/direct-connections")
 @airport_ns.doc(
     description="Get Direct Connections from Airport",
@@ -181,6 +207,7 @@ class AirportList(Resource):
     },
 )
 class DirectConnections(Resource):
+    @airport_ns.marshal_list_with(destination_airports_model)
     def get(self):
         airport = request.args.get("airport", "")
         limit = int(request.args.get("limit", 10))

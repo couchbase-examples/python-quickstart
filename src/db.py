@@ -24,7 +24,7 @@ class CouchbaseClient(object):
         self.app = app
         self.connect()
 
-    def connect(self):
+    def connect(self) -> None:
         """Connect to the Couchbase cluster"""
         # If the connection is not established, establish it now
         if not self.cluster:
