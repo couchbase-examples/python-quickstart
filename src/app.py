@@ -39,8 +39,8 @@ if __name__ == "__main__":
     couchbase_db.connect()
 
     # Add the routes
-    api.add_namespace(airport_ns, path="/airport")
-    api.add_namespace(airline_ns, path="/airline")
-    api.add_namespace(route_ns, path="/route")
+    api.add_namespace(airport_ns, path="/api/v1/airport")
+    api.add_namespace(airline_ns, path="/api/v1/airline")
+    api.add_namespace(route_ns, path="/api/v1/route")
 
     app.run(debug=True, port=8080)
