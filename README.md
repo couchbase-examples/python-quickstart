@@ -1,24 +1,34 @@
 # Quickstart in Couchbase with Flask and Python
 
-#### Build a REST API with Couchbase's Python SDK 4 and Flask
+#### Build a REST API with Couchbase's Python SDK (4.x) and Flask
 
-> This repo is designed to teach you how to connect to a Couchbase cluster to create, read, update, and delete documents and how to write simple parametrized N1QL queries.
+> This repo is designed to teach you how to connect to a Couchbase Capella cluster to create, read, update, and delete documents and how to write simple parametrized SQL++ queries using the built-in travel-sample bucket. If you want to run this tutorial using a self managed Couchbase cluster, please refer to the [appendix](#appendix-running-self-managed-couchbase-cluster).
 
-[![Try it now!](https://da-demo-images.s3.amazonaws.com/runItNow_outline.png?couchbase-example=python-flaskquickstart-repo&source=github)](https://gitpod.io/#https://github.com/couchbase-examples/python-quickstart)
-
-Full documentation can be found on the [Couchbase Developer Portal](https://developer.couchbase.com/tutorial-quickstart-flask-python/).
+Full documentation for the tutorial can be found on the [Couchbase Developer Portal](https://developer.couchbase.com/tutorial-quickstart-flask-python/).
 
 ## Prerequisites
 
 To run this prebuilt project, you will need:
 
-- Couchbase 7 Installed
-- [Python v3.x](https://www.python.org/downloads/) installed
-- Code Editor installed
+- Couchbase Server (7 or higher) with [travel-sample](https://docs.couchbase.com/python-sdk/current/ref/travel-app-data-model.html) bucket loaded.
+  - [Couchbase Capella](https://www.couchbase.com/products/capella/) is the easiest way to get started.
+- [Python](https://www.python.org/downloads/) 3.9 or higher installed
+
+### Loading Travel Sample Bucket
+
+If travel-sample is not loaded in your Couchbase cluster, you can load it by following the instructions for your Capella Cluster:
+
+- [Load travel-sample bucket in Couchbase Capella](https://docs.couchbase.com/cloud/clusters/data-service/import-data-documents.html#import-sample-data)
+
+### Data Model
+
+For this quickstart, we use three collections, `airport`, `airline` and `routes` that contain sample airports, airlines and airline routes respectively. The routes collection connects the airports and airlines as seen in the figure below. We use these connections in the quickstart to generate airports that are directly connected and airlines connecting to a destination airport. Note that these are just examples to highlight how you can use SQL++ queries to join the collections.
+
+![travel sample data model](travel_sample_data_model.png)
 
 ### Install Dependencies
 
-Dependencies can be installed through PIP the default package manage for Python.
+Dependencies can be installed through `pip` the default package manager for Python.
 
 ```sh
 python -m pip install -r requirements.txt
@@ -26,34 +36,42 @@ python -m pip install -r requirements.txt
 
 ### Database Server Configuration
 
-All configuration for communication with the database is stored in the `.env` file in the src folder. This includes the connection string, username, password, bucket name, colleciton name, and scope name.
+All configuration for communication with the database is read from the environment variables. We have provided a convenience feature in this quickstart to read the environment variables from a local file, `.env` in the source folder.
 
-There is an example file `.env.example` that can be used as the template for the pararmeters for your environment. You can copy this file and fill in with the values corresponding to your environment.
+Create a copy of .env.example & rename it to .env & add the values for the Couchbase connection.
 
-Note: If you are running with [Couchbase Capella](https://cloud.couchbase.com/), you need to change the `connect()` method to use TLS (currently commented out). Also ensure that the bucket exists on the cluster and your [IP address is whitelisted](https://docs.couchbase.com/cloud/get-started/cluster-and-data.html#allowed) on the Cluster. We do not use Certificates for authentication in this tutorial for simplicity. However for production use cases, it is recommended to enable Certificates.
+To know more about connecting to your Capella cluster, please follow the [instructions](https://docs.couchbase.com/cloud/get-started/connect.html).
 
-In order to initialize the scope and collection in the Capella cluster, you need to change the `initialize_db()` in `db_init.py` to use TLS (currently commented out).
+> DB_CONN_STR=<connection_string>
+> DB_USERNAME=<user_with_read_write_permission_to_travel-sample_bucket>
+> DB_PASSWORD=<password_for_user>
 
 ## Running The Application
 
-At this point the application is ready and you can run it. The bucket along with the scope and collection will be created on the cluster. For Capella, you need to ensure that the bucket is created before running the application.
+At this point, we have installed the dependencies, loaded the travel-sample data and configured the application with the credentials. The application is now ready and you can run it.
 
 ```sh
 cd src
-python db_init.py && flask run
+python app.py
 ```
-
-> \*Couchbase 7 must be installed and running on localhost (http://127.0.0.1:8091) prior to running the Flask Python app unless running Couchbase Capella.
 
 ## Running The Tests
 
-To run the standard integration tests, use the following commands:
+To run the standard unit tests, use the following commands:
 
 ```sh
 cd src
-pytest test.py
+python -m pytest
 ```
 
 ## Conclusion
 
-Setting up a basic REST API in Flask and Python with Couchbase is fairly simple. In this project when ran with Couchbase Server 7 installed, it will create a bucket in Couchbase, an index for our parameterized [N1QL query](https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html), and showcases basic CRUD operations needed in most applications.
+Setting up a basic REST API in Flask and Python with Couchbase is fairly simple. This project showcases basic CRUD operations needed in most applications using Couchbase Server.
+
+## Appendix: Running Self Managed Couchbase Cluster
+
+If you are running this quickstart with a self managed Couchbase cluster, you need to [load](https://docs.couchbase.com/server/current/manage/manage-settings/install-sample-buckets.html) the travel-sample data bucket in your cluster and generate the credentials for the bucket.
+
+You need to update the connection string and the credentials in the `.env` file in the source folder.
+
+> Note: Couchbase Server must be installed and running prior to running the Flask Python app.
