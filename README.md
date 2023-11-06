@@ -42,9 +42,11 @@ Create a copy of .env.example & rename it to .env & add the values for the Couch
 
 To know more about connecting to your Capella cluster, please follow the [instructions](https://docs.couchbase.com/cloud/get-started/connect.html).
 
-> DB_CONN_STR=<connection_string>
-> DB_USERNAME=<user_with_read_write_permission_to_travel-sample_bucket>
-> DB_PASSWORD=<password_for_user>
+```sh
+DB_CONN_STR=<connection_string>
+DB_USERNAME=<user_with_read_write_permission_to_travel-sample_bucket>
+DB_PASSWORD=<password_for_user>
+```
 
 ## Running The Application
 
