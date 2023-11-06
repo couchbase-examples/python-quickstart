@@ -16,15 +16,9 @@ To run this prebuilt project, you will need:
 
 ### Loading Travel Sample Bucket
 
-If travel-sample is not loaded in your Couchbase cluster, you can load it by following the instructions for your Capella Cluster:
+If travel-sample is not loaded in your Capella cluster, you can load it by following the instructions for your Capella Cluster:
 
 - [Load travel-sample bucket in Couchbase Capella](https://docs.couchbase.com/cloud/clusters/data-service/import-data-documents.html#import-sample-data)
-
-### Data Model
-
-For this quickstart, we use three collections, `airport`, `airline` and `routes` that contain sample airports, airlines and airline routes respectively. The routes collection connects the airports and airlines as seen in the figure below. We use these connections in the quickstart to generate airports that are directly connected and airlines connecting to a destination airport. Note that these are just examples to highlight how you can use SQL++ queries to join the collections.
-
-![travel sample data model](travel_sample_data_model.png)
 
 ### Install Dependencies
 
@@ -48,9 +42,15 @@ DB_USERNAME=<user_with_read_write_permission_to_travel-sample_bucket>
 DB_PASSWORD=<password_for_user>
 ```
 
+> Note: The connection string expects the `couchbases://` or `couchbase://` part.
+
 ## Running The Application
 
+### Running directly on machine
+
 At this point, we have installed the dependencies, loaded the travel-sample data and configured the application with the credentials. The application is now ready and you can run it.
+
+The application will run on port 8080 of your local machine (http://localhost:8080). You will find the Swagger documentation of the API.
 
 ```sh
 cd src
@@ -83,9 +83,11 @@ cd src
 python -m pytest
 ```
 
-## Conclusion
+## Appendix: Data Model
 
-Setting up a basic REST API in Flask and Python with Couchbase is fairly simple. This project showcases basic CRUD operations needed in most applications using Couchbase Server.
+For this quickstart, we use three collections, `airport`, `airline` and `routes` that contain sample airports, airlines and airline routes respectively. The routes collection connects the airports and airlines as seen in the figure below. We use these connections in the quickstart to generate airports that are directly connected and airlines connecting to a destination airport. Note that these are just examples to highlight how you can use SQL++ queries to join the collections.
+
+![travel sample data model](travel_sample_data_model.png)
 
 ## Appendix: Running Self Managed Couchbase Cluster
 
