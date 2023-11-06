@@ -16,31 +16,30 @@ api = Api(
 )
 api.init_app(app)
 
+load_dotenv()
+
+conn_str = os.getenv("DB_CONN_STR")
+username = os.getenv("DB_USERNAME")
+password = os.getenv("DB_PASSWORD")
+
+if conn_str is None:
+    print("DB_CONN_STR environment variable not set")
+    exit()
+if username is None:
+    print("DB_USERNAME environment variable not set")
+    exit()
+if password is None:
+    print("DB_PASSWORD environment variable not set")
+    exit()
+
+# Create the database connection
+couchbase_db.init_app(conn_str, username, password, app)
+couchbase_db.connect()
+
+# Add the routes
+api.add_namespace(airport_ns, path="/api/v1/airport")
+api.add_namespace(airline_ns, path="/api/v1/airline")
+api.add_namespace(route_ns, path="/api/v1/route")
 
 if __name__ == "__main__":
-    load_dotenv()
-
-    conn_str = os.getenv("DB_CONN_STR")
-    username = os.getenv("DB_USERNAME")
-    password = os.getenv("DB_PASSWORD")
-
-    if conn_str is None:
-        print("DB_CONN_STR environment variable not set")
-        exit()
-    if username is None:
-        print("DB_USERNAME environment variable not set")
-        exit()
-    if password is None:
-        print("DB_PASSWORD environment variable not set")
-        exit()
-
-    # Create the database connection
-    couchbase_db.init_app(conn_str, username, password, app)
-    couchbase_db.connect()
-
-    # Add the routes
-    api.add_namespace(airport_ns, path="/api/v1/airport")
-    api.add_namespace(airline_ns, path="/api/v1/airline")
-    api.add_namespace(route_ns, path="/api/v1/route")
-
-    app.run(debug=True, port=8080)
+    app.run(debug=True, host="0.0.0.0", port=8080)

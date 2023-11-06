@@ -55,6 +55,23 @@ cd src
 python app.py
 ```
 
+### Running using Docker
+
+- Build the Docker image
+
+```sh
+cd src
+docker build -t couchbase-flask-quickstart .
+```
+
+- Run the Docker image
+
+```sh
+docker run -it --env-file .env -p 8080:8080 couchbase-flask-quickstart
+```
+
+> Note: The `.env` file has the connection information to connect to your Capella cluster. The application can now be reached on port 8080 of your local machine.
+
 ## Running The Tests
 
 To run the standard unit tests, use the following commands:
