@@ -1,6 +1,7 @@
 import pytest
 import os
 import sys
+from couchbase.exceptions import DocumentNotFoundException
 
 sys.path.append("..")
 
@@ -53,3 +54,17 @@ def route_api():
 @pytest.fixture(scope="module")
 def route_collection():
     return "route"
+
+
+class Helpers:
+    @staticmethod
+    def delete_existing_document(couchbase_client, collection, key):
+        try:
+            couchbase_client.delete_document(collection, key)
+        except DocumentNotFoundException:
+            pass
+
+
+@pytest.fixture(autouse=True, scope="session")
+def helpers():
+    return Helpers

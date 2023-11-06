@@ -32,7 +32,7 @@ route_model = route_ns.model(
         "destinationairport": fields.String(
             required=True, description="Destination Airport", example="JFK"
         ),
-        "stops": fields.Integer(description="Stops"),
+        "stops": fields.Integer(description="Stops", example=0),
         "equipment": fields.String(description="Equipment", example="CRJ"),
         "schedule": fields.List(fields.Nested(schedule_fields)),
         "distance": fields.Float(description="Distance in km", example=4151.79),
@@ -44,7 +44,7 @@ route_model = route_ns.model(
 @route_ns.doc(params={"id": "Route ID like route_10000"})
 class RouteId(Resource):
     @route_ns.doc(
-        description="Create Route",
+        description="Create Route with specified ID",
         responses={
             201: "Created",
             409: "Route already exists",
@@ -63,7 +63,7 @@ class RouteId(Resource):
             return f"Unexpected error: {e}", 500
 
     @route_ns.doc(
-        description="Get Route",
+        description="Get Route with specified ID",
         responses={
             200: "Route",
             404: "Route ID not found",
@@ -81,7 +81,7 @@ class RouteId(Resource):
             return f"Unexpected error: {e}", 500
 
     @route_ns.doc(
-        description="Update Route",
+        description="Update Route with specified ID",
         responses={
             200: "Route Updated",
             500: "Unexpected Error",
@@ -97,7 +97,7 @@ class RouteId(Resource):
             return f"Unexpected error: {e}", 500
 
     @route_ns.doc(
-        description="Delete Route",
+        description="Delete Route with specified ID",
         responses={
             204: "Route Deleted",
             404: "Route not found",

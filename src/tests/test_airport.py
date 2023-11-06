@@ -7,7 +7,9 @@ python -m pytest"""
 
 
 class TestAirport:
-    def test_add_airport(self, couchbase_client, airport_api, airport_collection):
+    def test_add_airport(
+        self, couchbase_client, airport_api, airport_collection, helpers
+    ):
         """Test the successful creation of an airport"""
         airport_data = {
             "airportname": "Test Airport",
@@ -19,6 +21,9 @@ class TestAirport:
             "geo": {"lat": 40, "lon": 42, "alt": 100},
         }
         document_id = "airport_test_insert"
+        helpers.delete_existing_document(
+            couchbase_client, airport_collection, document_id
+        )
         response = requests.post(url=f"{airport_api}/{document_id}", json=airport_data)
         assert response.status_code == 201
 
@@ -30,7 +35,7 @@ class TestAirport:
         couchbase_client.delete_document(airport_collection, key=document_id)
 
     def test_add_duplicate_airport(
-        self, couchbase_client, airport_api, airport_collection
+        self, couchbase_client, airport_api, airport_collection, helpers
     ):
         """Test the failed creation of an airport due to an existing airport"""
         airport_data = {
@@ -43,6 +48,9 @@ class TestAirport:
             "geo": {"lat": 40, "lon": 42, "alt": 100},
         }
         document_id = "airport_test_duplicate"
+        helpers.delete_existing_document(
+            couchbase_client, airport_collection, document_id
+        )
         response = requests.post(url=f"{airport_api}/{document_id}", json=airport_data)
         assert response.status_code == 201
         response = requests.post(url=f"{airport_api}/{document_id}", json=airport_data)
@@ -71,7 +79,9 @@ class TestAirport:
         with pytest.raises(DocumentNotFoundException):
             couchbase_client.get_document(airport_collection, key=document_id)
 
-    def test_read_airport(self, couchbase_client, airport_api, airport_collection):
+    def test_read_airport(
+        self, couchbase_client, airport_api, airport_collection, helpers
+    ):
         """Test the reading of an airport"""
         airport_data = {
             "airportname": "Test Airport",
@@ -83,6 +93,9 @@ class TestAirport:
             "geo": {"lat": 40, "lon": 42, "alt": 100},
         }
         document_id = "airport_test_read"
+        helpers.delete_existing_document(
+            couchbase_client, airport_collection, document_id
+        )
         couchbase_client.insert_document(
             airport_collection, key=document_id, doc=airport_data
         )
@@ -95,16 +108,21 @@ class TestAirport:
         couchbase_client.delete_document(airport_collection, key=document_id)
 
     def test_read_invalid_airport(
-        self, couchbase_client, airport_api, airport_collection
+        self, couchbase_client, airport_api, airport_collection, helpers
     ):
         """Test the reading of an invalid airport"""
         document_id = "airport_test_invalid_id"
+        helpers.delete_existing_document(
+            couchbase_client, airport_collection, document_id
+        )
         with pytest.raises(DocumentNotFoundException):
             couchbase_client.get_document(airport_collection, key=document_id)
         response = requests.get(url=f"{airport_api}/{document_id}")
         assert response.status_code == 404
 
-    def test_update_airport(self, couchbase_client, airport_api, airport_collection):
+    def test_update_airport(
+        self, couchbase_client, airport_api, airport_collection, helpers
+    ):
         """Test updating an existing airport"""
         airport_data = {
             "airportname": "Test Airport",
@@ -116,6 +134,9 @@ class TestAirport:
             "geo": {"lat": 40, "lon": 42, "alt": 100},
         }
         document_id = "airport_test_update"
+        helpers.delete_existing_document(
+            couchbase_client, airport_collection, document_id
+        )
         couchbase_client.insert_document(
             airport_collection, key=document_id, doc=airport_data
         )
@@ -170,7 +191,9 @@ class TestAirport:
         with pytest.raises(DocumentNotFoundException):
             couchbase_client.get_document(airport_collection, key=document_id)
 
-    def test_delete_airport(self, couchbase_client, airport_api, airport_collection):
+    def test_delete_airport(
+        self, couchbase_client, airport_api, airport_collection, helpers
+    ):
         """Test deleting an existing airport"""
         airport_data = {
             "airportname": "Test Airport",
@@ -182,6 +205,9 @@ class TestAirport:
             "geo": {"lat": 40, "lon": 42, "alt": 100},
         }
         document_id = "airport_test_delete"
+        helpers.delete_existing_document(
+            couchbase_client, airport_collection, document_id
+        )
         couchbase_client.insert_document(
             airport_collection, key=document_id, doc=airport_data
         )
@@ -193,14 +219,25 @@ class TestAirport:
             couchbase_client.get_document(airport_collection, key=document_id)
 
     def test_delete_non_existing_airport(
-        self, couchbase_client, airport_api, airport_collection
+        self, couchbase_client, airport_api, airport_collection, helpers
     ):
         """Test deleting a non-existing airport"""
         document_id = "airport_test_delete_non_existing"
+        helpers.delete_existing_document(
+            couchbase_client, airport_collection, document_id
+        )
         with pytest.raises(DocumentNotFoundException):
             couchbase_client.get_document(airport_collection, key=document_id)
         response = requests.delete(url=f"{airport_api}/{document_id}")
         assert response.status_code == 404
+
+    def test_list_airports(self, airport_api):
+        """Test listing airports without specifying a country"""
+        response = requests.get(url=f"{airport_api}/list")
+        assert response.status_code == 200
+        response_data = response.json()
+        # Default page size
+        assert len(response_data) == 10
 
     def test_list_airports_in_country(self, airport_api):
         """Test listing airports in a country"""

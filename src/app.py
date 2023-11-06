@@ -9,6 +9,11 @@ from flask_restx import Api
 
 # Define the flask app and api
 app = Flask(__name__)
+
+# Disable field masks in the Swagger docs
+# https://flask-restx.readthedocs.io/en/latest/mask.html
+app.config["RESTX_MASK_SWAGGER"] = False
+
 api = Api(
     title="Python Quickstart using Flask",
     version="1.0",

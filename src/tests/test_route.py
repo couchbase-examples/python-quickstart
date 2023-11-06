@@ -4,7 +4,7 @@ from couchbase.exceptions import DocumentNotFoundException
 
 
 class Testroute:
-    def test_add_route(self, couchbase_client, route_api, route_collection):
+    def test_add_route(self, couchbase_client, route_api, route_collection, helpers):
         """Test the successful creation of an route"""
         route_data = {
             "airline": "SAF",
@@ -17,6 +17,9 @@ class Testroute:
             "distance": 1000.79,
         }
         document_id = "route_test_insert"
+        helpers.delete_existing_document(
+            couchbase_client, route_collection, document_id
+        )
         response = requests.post(url=f"{route_api}/{document_id}", json=route_data)
         assert response.status_code == 201
 
@@ -27,7 +30,9 @@ class Testroute:
         assert doc_in_db == route_data
         couchbase_client.delete_document(route_collection, key=document_id)
 
-    def test_add_duplicate_route(self, couchbase_client, route_api, route_collection):
+    def test_add_duplicate_route(
+        self, couchbase_client, route_api, route_collection, helpers
+    ):
         """Test the failed creation of an route due to an existing route"""
         route_data = {
             "airline": "SAF",
@@ -40,6 +45,9 @@ class Testroute:
             "distance": 1000.79,
         }
         document_id = "route_test_duplicate"
+        helpers.delete_existing_document(
+            couchbase_client, route_collection, document_id
+        )
         response = requests.post(url=f"{route_api}/{document_id}", json=route_data)
         assert response.status_code == 201
         response = requests.post(url=f"{route_api}/{document_id}", json=route_data)
@@ -71,7 +79,7 @@ class Testroute:
         with pytest.raises(DocumentNotFoundException):
             couchbase_client.get_document(route_collection, key=document_id)
 
-    def test_read_route(self, couchbase_client, route_api, route_collection):
+    def test_read_route(self, couchbase_client, route_api, route_collection, helpers):
         """Test the reading of an route"""
         route_data = {
             "airline": "SAF",
@@ -84,6 +92,9 @@ class Testroute:
             "distance": 1000.79,
         }
         document_id = "route_test_read"
+        helpers.delete_existing_document(
+            couchbase_client, route_collection, document_id
+        )
         couchbase_client.insert_document(
             route_collection, key=document_id, doc=route_data
         )
@@ -95,15 +106,20 @@ class Testroute:
 
         couchbase_client.delete_document(route_collection, key=document_id)
 
-    def test_read_invalid_route(self, couchbase_client, route_api, route_collection):
+    def test_read_invalid_route(
+        self, couchbase_client, route_api, route_collection, helpers
+    ):
         """Test the reading of an invalid route"""
         document_id = "route_test_invalid_id"
+        helpers.delete_existing_document(
+            couchbase_client, route_collection, document_id
+        )
         with pytest.raises(DocumentNotFoundException):
             couchbase_client.get_document(route_collection, key=document_id)
         response = requests.get(url=f"{route_api}/{document_id}")
         assert response.status_code == 404
 
-    def test_update_route(self, couchbase_client, route_api, route_collection):
+    def test_update_route(self, couchbase_client, route_api, route_collection, helpers):
         """Test updating an existing route"""
         route_data = {
             "airline": "SAF",
@@ -116,6 +132,9 @@ class Testroute:
             "distance": 1000.79,
         }
         document_id = "route_test_update"
+        helpers.delete_existing_document(
+            couchbase_client, route_collection, document_id
+        )
         couchbase_client.insert_document(
             route_collection, key=document_id, doc=route_data
         )
@@ -169,7 +188,7 @@ class Testroute:
         with pytest.raises(DocumentNotFoundException):
             couchbase_client.get_document(route_collection, key=document_id)
 
-    def test_delete_route(self, couchbase_client, route_api, route_collection):
+    def test_delete_route(self, couchbase_client, route_api, route_collection, helpers):
         """Test deleting an existing route"""
         route_data = {
             "airline": "SAF",
@@ -182,6 +201,9 @@ class Testroute:
             "distance": 1000.79,
         }
         document_id = "route_test_delete"
+        helpers.delete_existing_document(
+            couchbase_client, route_collection, document_id
+        )
         couchbase_client.insert_document(
             route_collection, key=document_id, doc=route_data
         )
@@ -193,10 +215,13 @@ class Testroute:
             couchbase_client.get_document(route_collection, key=document_id)
 
     def test_delete_non_existing_route(
-        self, couchbase_client, route_api, route_collection
+        self, couchbase_client, route_api, route_collection, helpers
     ):
         """Test deleting a non-existing route"""
         document_id = "route_test_delete_non_existing"
+        helpers.delete_existing_document(
+            couchbase_client, route_collection, document_id
+        )
         with pytest.raises(DocumentNotFoundException):
             couchbase_client.get_document(route_collection, key=document_id)
         response = requests.delete(url=f"{route_api}/{document_id}")

@@ -36,9 +36,11 @@ airport_model = airport_ns.model(
             required=True, description="Airport Name", example="Sample Airport"
         ),
         "city": fields.String(required=True, description="City", example="Sample City"),
-        "country": fields.String(required=True, description="Country"),
-        "faa": fields.String(required=True, description="FAA code"),
-        "icao": fields.String(description="ICAO code"),
+        "country": fields.String(
+            required=True, description="Country", example="United Kingdom"
+        ),
+        "faa": fields.String(required=True, description="FAA code", example="SAA"),
+        "icao": fields.String(description="ICAO code", example="SAAA"),
         "tz": fields.String(description="Timezone", example="Europe/Paris"),
         "geo": fields.Nested(geo_cordinate_fields),
     },
@@ -49,7 +51,7 @@ airport_model = airport_ns.model(
 @airport_ns.doc(params={"id": "Airport ID like airport_1273"})
 class AirportId(Resource):
     @airport_ns.doc(
-        description="Create Airport",
+        description="Create Airport with specified ID",
         responses={
             201: "Created",
             409: "Airport already exists",
@@ -68,7 +70,7 @@ class AirportId(Resource):
             return f"Unexpected error: {e}", 500
 
     @airport_ns.doc(
-        description="Get Airport",
+        description="Get Airport with specified ID",
         responses={
             200: "Found Airport",
             404: "Airport ID not found",
@@ -86,7 +88,7 @@ class AirportId(Resource):
             return f"Unexpected error: {e}", 500
 
     @airport_ns.doc(
-        description="Update Airport",
+        description="Update Airport with specified ID",
         responses={
             200: "Airport Updated",
             500: "Unexpected Error",
@@ -102,7 +104,7 @@ class AirportId(Resource):
             return f"Unexpected error: {e}", 500
 
     @airport_ns.doc(
-        description="Delete Airport",
+        description="Delete Airport with specified ID",
         responses={
             204: "Airport Deleted",
             404: "Airport not found",
@@ -121,10 +123,15 @@ class AirportId(Resource):
 
 @airport_ns.route("/list")
 @airport_ns.doc(
-    description="Get Airports by Country",
+    description="Get list of Airports. Optionally, you can filter the list by Country",
     reponses={200: "List of airports", 500: "Unexpected Error"},
     params={
-        "country": {"description": "Country", "in": "query", "required": True},
+        "country": {
+            "description": "Country",
+            "in": "query",
+            "required": False,
+            "example": "United Kingdom, France, United States",
+        },
         "limit": {
             "description": "Number of airports to return (page size)",
             "in": "query",
@@ -146,7 +153,7 @@ class AirportList(Resource):
         limit = int(request.args.get("limit", 10))
         offset = int(request.args.get("offset", 0))
 
-        try:
+        if country:
             query = """
                 SELECT airport.airportname,
                     airport.city,
@@ -161,7 +168,21 @@ class AirportList(Resource):
                 LIMIT $limit
                 OFFSET $offset;
             """
-
+        else:
+            query = """
+                SELECT airport.airportname,
+                    airport.city,
+                    airport.country,
+                    airport.faa,
+                    airport.geo,
+                    airport.icao,
+                    airport.tz
+                FROM airport AS airport
+                ORDER BY airport.airportname
+                LIMIT $limit
+                OFFSET $offset;
+            """
+        try:
             results = couchbase_db.query(
                 query, country=country, limit=limit, offset=offset
             )
@@ -183,14 +204,14 @@ destination_airports_model = airport_ns.model(
 
 @airport_ns.route("/direct-connections")
 @airport_ns.doc(
-    description="Get Direct Connections from Airport",
+    description="Get Direct Connections from specified Airport",
     reponses={200: "List of direct connections", 500: "Unexpected Error"},
     params={
         "airport": {
-            "description": "Airport",
+            "description": "Source airport",
             "in": "query",
             "required": True,
-            "example": "SFO",
+            "example": "SFO, LHR, CDG",
         },
         "limit": {
             "description": "Number of direct connections to return (page size)",

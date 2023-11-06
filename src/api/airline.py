@@ -17,10 +17,12 @@ airline_model = airline_ns.model(
         "name": fields.String(
             required=True, description="Airline Name", example="Sample Airline"
         ),
-        "iato": fields.String(description="IATA code"),
-        "icao": fields.String(description="ICAO code"),
-        "callsign": fields.String(required=True, description="Callsign"),
-        "country": fields.String(required=True, description="Country"),
+        "iato": fields.String(description="IATA code", example="SA"),
+        "icao": fields.String(description="ICAO code", example="SAF"),
+        "callsign": fields.String(required=True, description="Callsign", example="SAF"),
+        "country": fields.String(
+            required=True, description="Country", example="United States"
+        ),
     },
 )
 
@@ -29,7 +31,7 @@ airline_model = airline_ns.model(
 @airline_ns.doc(params={"id": "Airline ID like airline_10"})
 class AirlineId(Resource):
     @airline_ns.doc(
-        description="Create Airline",
+        description="Create Airline with specified ID",
         responses={
             201: "Created",
             409: "Airline already exists",
@@ -48,7 +50,7 @@ class AirlineId(Resource):
             return f"Unexpected error: {e}", 500
 
     @airline_ns.doc(
-        description="Get Airline",
+        description="Get Airline with specified ID",
         responses={
             200: "Found Airline",
             404: "Airline ID not found",
@@ -66,7 +68,7 @@ class AirlineId(Resource):
             return f"Unexpected error: {e}", 500
 
     @airline_ns.doc(
-        description="Update Airline",
+        description="Update Airline with specified ID",
         responses={
             200: "Airline Updated",
             500: "Unexpected Error",
@@ -82,7 +84,7 @@ class AirlineId(Resource):
             return f"Unexpected error: {e}", 500
 
     @airline_ns.doc(
-        description="Delete Airline",
+        description="Delete Airline with specified ID",
         responses={
             204: "Airline Deleted",
             404: "Airline not found",
@@ -101,14 +103,14 @@ class AirlineId(Resource):
 
 @airline_ns.route("/list")
 @airline_ns.doc(
-    description="Get Airlines by Country",
+    description="Get list of Airlines. Optionally, you can filter the list by Country",
     reponses={200: "List of airlines", 500: "Unexpected Error"},
     params={
         "country": {
             "description": "Country",
             "in": "query",
-            "required": True,
-            "example": "France",
+            "required": False,
+            "example": "France, United Kingdom, United States",
         },
         "limit": {
             "description": "Number of airlines to return (page size)",
@@ -130,8 +132,7 @@ class AirlineList(Resource):
         country = request.args.get("country", "")
         limit = int(request.args.get("limit", 10))
         offset = int(request.args.get("offset", 0))
-
-        try:
+        if country:
             query = """
                 SELECT airline.callsign,
                     airline.country,
@@ -144,6 +145,21 @@ class AirlineList(Resource):
                 LIMIT $limit 
                 OFFSET $offset;
             """
+
+        else:
+            query = """
+                SELECT airline.callsign,
+                    airline.country,
+                    airline.iata,
+                    airline.icao,
+                    airline.name
+                FROM airline as airline 
+                ORDER BY airline.name
+                LIMIT $limit 
+                OFFSET $offset;
+            """
+
+        try:
             result = couchbase_db.query(
                 query, country=country, limit=limit, offset=offset
             )
@@ -155,14 +171,14 @@ class AirlineList(Resource):
 
 @airline_ns.route("/to-airport")
 @airline_ns.doc(
-    description="Get Airlines flying to Airport",
+    description="Get Airlines flying to specified destination Airport",
     reponses={200: "List of airlines", 500: "Unexpected Error"},
     params={
         "airport": {
             "description": "Destination airport",
             "in": "query",
             "required": True,
-            "example": "SFO",
+            "example": "SFO, JFK, LAX",
         },
         "limit": {
             "description": "Number of airlines to return (page size)",
