@@ -6,7 +6,7 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: "0 11 * * 0"
+    - cron: "0 11 * * *"
 
 jobs:
   test:
@@ -40,7 +40,6 @@ jobs:
         uses: ravsamhq/notify-slack-action@v1
         with:
           status: ${{ job.status }}
-          notify_when: "failure,warnings"
           notification_title: "Repo: *{repo}*"
           message_format: "{emoji}    *{status_message}* in <{repo_url}|{repo}@{branch}> on <{commit_url}|{commit_sha}>"
           footer: "<{run_url}|View Full Run on GitHub>"
