@@ -13,6 +13,7 @@ To run this prebuilt project, you will need:
 - Couchbase Server (7 or higher) with [travel-sample](https://docs.couchbase.com/python-sdk/current/ref/travel-app-data-model.html) bucket loaded.
   - [Couchbase Capella](https://www.couchbase.com/products/capella/) is the easiest way to get started.
 - [Python](https://www.python.org/downloads/) 3.9 or higher installed
+  - Ensure that the Python version is [compatible](https://docs.couchbase.com/python-sdk/current/project-docs/compatibility.html#python-version-compat) with the Couchbase SDK.
 
 ### Loading Travel Sample Bucket
 
@@ -25,6 +26,7 @@ If travel-sample is not loaded in your Capella cluster, you can load it by follo
 Dependencies can be installed through `pip` the default package manager for Python.
 
 ```sh
+cd src
 python -m pip install -r requirements.txt
 ```
 
@@ -36,6 +38,11 @@ Create a copy of .env.example & rename it to .env & add the values for the Couch
 
 To know more about connecting to your Capella cluster, please follow the [instructions](https://docs.couchbase.com/cloud/get-started/connect.html).
 
+Specifically, you need to do the following:
+
+- Create the [database credentials](https://docs.couchbase.com/cloud/clusters/manage-database-users.html) to access the travel-sample bucket (Read and Write) used in the application.
+- [Allow access](https://docs.couchbase.com/cloud/clusters/allow-ip-address.html) to the Cluster from the IP on which the application is running.
+
 ```sh
 DB_CONN_STR=<connection_string>
 DB_USERNAME=<user_with_read_write_permission_to_travel-sample_bucket>
@@ -46,11 +53,11 @@ DB_PASSWORD=<password_for_user>
 
 ## Running The Application
 
+The application will run on port 8080 of your local machine (http://localhost:8080). You will find the Swagger documentation of the API.
+
 ### Running directly on machine
 
 At this point, we have installed the dependencies, loaded the travel-sample data and configured the application with the credentials. The application is now ready and you can run it.
-
-The application will run on port 8080 of your local machine (http://localhost:8080). You will find the Swagger documentation of the API.
 
 ```sh
 cd src
@@ -72,7 +79,7 @@ docker build -t couchbase-flask-quickstart .
 docker run -it --env-file .env -p 8080:8080 couchbase-flask-quickstart
 ```
 
-> Note: The `.env` file has the connection information to connect to your Capella cluster. The application can now be reached on port 8080 of your local machine.
+> Note: The `.env` file has the connection information to connect to your Capella cluster. These will be part of the environment variables in the Docker container.
 
 ## Running The Tests
 
