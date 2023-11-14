@@ -53,8 +53,6 @@ DB_PASSWORD=<password_for_user>
 
 ## Running The Application
 
-The application will run on port 8080 of your local machine (http://localhost:8080). You will find the Swagger documentation of the API.
-
 ### Running directly on machine
 
 At this point, we have installed the dependencies, loaded the travel-sample data and configured the application with the credentials. The application is now ready and you can run it.
@@ -80,6 +78,16 @@ docker run -it --env-file .env -p 8080:8080 couchbase-flask-quickstart
 ```
 
 > Note: The `.env` file has the connection information to connect to your Capella cluster. These will be part of the environment variables in the Docker container.
+
+### Checking the Application
+
+Once the application starts, you can see the details of the application on the logs.
+
+![Application Startup](app_startup.png)
+
+The application will run on port 8080 of your local machine (http://localhost:8080). You will find the Swagger documentation of the API if you go to the URL in your browser.
+
+![Swagger Documentation](swagger_documentation.png)
 
 ## Running The Tests
 
