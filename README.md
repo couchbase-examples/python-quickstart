@@ -23,7 +23,7 @@ If travel-sample is not loaded in your Capella cluster, you can load it by follo
 
 ### Install Dependencies
 
-Dependencies can be installed through `pip` the default package manager for Python.
+The dependencies for the application are specified in the `requirements.txt` file in the src folder. Dependencies can be installed through `pip` the default package manager for Python.
 
 ```sh
 cd src
