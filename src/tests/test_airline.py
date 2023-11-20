@@ -10,7 +10,7 @@ class TestAirline:
         """Test the successful creation of an airline"""
         airline_data = {
             "name": "Sample Airline",
-            "iato": "SAL",
+            "iata": "SAL",
             "icao": "SALL",
             "callsign": "SAM",
             "country": "Sample Country",
@@ -35,7 +35,7 @@ class TestAirline:
         """Test the failed creation of an airline due to an existing airline"""
         airline_data = {
             "name": "Sample Airline",
-            "iato": "SAL",
+            "iata": "SAL",
             "icao": "SALL",
             "callsign": "SAM",
             "country": "Sample Country",
@@ -55,7 +55,7 @@ class TestAirline:
     ):
         """Test the creation of an airline without required fields"""
         airline_data = {
-            "iato": "SAL",
+            "iata": "SAL",
             "icao": "SALL",
             "country": "Sample Country",
         }
@@ -77,7 +77,7 @@ class TestAirline:
         """Test the reading of an airline"""
         airline_data = {
             "name": "Sample Airline",
-            "iato": "SAL",
+            "iata": "SAL",
             "icao": "SALL",
             "callsign": "SAM",
             "country": "Sample Country",
@@ -116,7 +116,7 @@ class TestAirline:
         """Test updating an existing airline"""
         airline_data = {
             "name": "Sample Airline",
-            "iato": "SAL",
+            "iata": "SAL",
             "icao": "SALL",
             "callsign": "SAM",
             "country": "Sample Country",
@@ -131,7 +131,7 @@ class TestAirline:
 
         updated_airline_data = {
             "name": "Updated Airline",
-            "iato": "SAL",
+            "iata": "SAL",
             "icao": "SALL",
             "callsign": "SAM",
             "country": "Updated Country",
@@ -155,7 +155,7 @@ class TestAirline:
         """Test updating an airline with an invalid airline"""
         document_id = "airline_test_update_invalid_doc"
         updated_airline_data = {
-            "iato": "SAL",
+            "iata": "SAL",
             "icao": "SALL",
             "callsign": "SAM",
             "country": "Updated Country",
@@ -178,7 +178,7 @@ class TestAirline:
         """Test deleting an existing airline"""
         airline_data = {
             "name": "Sample Airline",
-            "iato": "SAL",
+            "iata": "SAL",
             "icao": "SALL",
             "callsign": "SAM",
             "country": "Sample Country",

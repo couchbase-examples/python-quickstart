@@ -8,7 +8,7 @@ class Testroute:
         """Test the successful creation of an route"""
         route_data = {
             "airline": "SAF",
-            "airline_id": "airline_sample",
+            "airlineid": "airline_sample",
             "sourceairport": "SFO",
             "destinationairport": "JFK",
             "stops": 0,
@@ -36,7 +36,7 @@ class Testroute:
         """Test the failed creation of an route due to an existing route"""
         route_data = {
             "airline": "SAF",
-            "airline_id": "airline_sample",
+            "airlineid": "airline_sample",
             "sourceairport": "SFO",
             "destinationairport": "JFK",
             "stops": 0,
@@ -58,8 +58,8 @@ class Testroute:
         self, couchbase_client, route_api, route_collection
     ):
         """Test the creation of an route without required fields"""
-        route_data = route_data = {
-            "airline_id": "airline_sample",
+        route_data = {
+            "airlineid": "airline_sample",
             "destinationairport": "JFK",
             "stops": 0,
             "equipment": "CRJ",
@@ -83,7 +83,7 @@ class Testroute:
         """Test the reading of an route"""
         route_data = {
             "airline": "SAF",
-            "airline_id": "airline_sample",
+            "airlineid": "airline_sample",
             "sourceairport": "SFO",
             "destinationairport": "JFK",
             "stops": 0,
@@ -123,7 +123,7 @@ class Testroute:
         """Test updating an existing route"""
         route_data = {
             "airline": "SAF",
-            "airline_id": "airline_sample",
+            "airlineid": "airline_sample",
             "sourceairport": "SFO",
             "destinationairport": "JFK",
             "stops": 0,
@@ -141,7 +141,7 @@ class Testroute:
 
         updated_route_data = {
             "airline": "USAF",
-            "airline_id": "airline_sample_updated",
+            "airlineid": "airline_sample_updated",
             "sourceairport": "SFO",
             "destinationairport": "JFK",
             "stops": 0,
@@ -168,7 +168,7 @@ class Testroute:
         """Test updating an route with an invalid route"""
         document_id = "route_test_update_invalid_doc"
         updated_route_data = {
-            "airline_id": "airline_sample",
+            "airlineid": "airline_sample",
             "sourceairport": "SFO",
             "destinationairport": "JFK",
             "stops": 0,
@@ -192,7 +192,7 @@ class Testroute:
         """Test deleting an existing route"""
         route_data = {
             "airline": "SAF",
-            "airline_id": "airline_sample",
+            "airlineid": "airline_sample",
             "sourceairport": "SFO",
             "destinationairport": "JFK",
             "stops": 0,

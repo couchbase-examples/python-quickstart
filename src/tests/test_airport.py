@@ -2,9 +2,6 @@ import requests
 import pytest
 from couchbase.exceptions import DocumentNotFoundException
 
-"""How to Run Unit Tests
-python -m pytest"""
-
 
 class TestAirport:
     def test_add_airport(

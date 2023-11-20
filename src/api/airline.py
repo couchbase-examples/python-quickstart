@@ -17,7 +17,7 @@ airline_model = airline_ns.model(
         "name": fields.String(
             required=True, description="Airline Name", example="Sample Airline"
         ),
-        "iato": fields.String(description="IATA code", example="SA"),
+        "iata": fields.String(description="IATA code", example="SA"),
         "icao": fields.String(description="ICAO code", example="SAF"),
         "callsign": fields.String(required=True, description="Callsign", example="SAF"),
         "country": fields.String(
@@ -221,7 +221,7 @@ class AirlinesToAirport(Resource):
             result = couchbase_db.query(
                 query, airport=airport, limit=limit, offset=offset
             )
-            airports = [r for r in result]
-            return airports
+            airlines = [r for r in result]
+            return airlines
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500

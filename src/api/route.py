@@ -23,7 +23,7 @@ route_model = route_ns.model(
     "Route",
     {
         "airline": fields.String(required=True, description="Airline", example="AF"),
-        "airline_id": fields.String(
+        "airlineid": fields.String(
             required=True, description="Airline ID", example="airline_10"
         ),
         "sourceairport": fields.String(
