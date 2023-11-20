@@ -71,6 +71,7 @@ class CouchbaseClient(object):
             print(
                 "Error fetching scopes in cluster. \nEnsure that travel-sample bucket exists."
             )
+            print(e)
             exit()
 
     def get_document(self, collection_name: str, key: str):

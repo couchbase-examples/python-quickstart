@@ -64,7 +64,7 @@ class AirportId(Resource):
             data = request.json
             couchbase_db.insert_document(AIRPORT_COLLECTION, key=id, doc=data)
             return data, 201
-        except DocumentExistsException as e:
+        except DocumentExistsException:
             return "Airport already exists", 409
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500
@@ -82,7 +82,7 @@ class AirportId(Resource):
         try:
             result = couchbase_db.get_document(AIRPORT_COLLECTION, key=id)
             return result.content_as[dict]
-        except DocumentNotFoundException as e:
+        except DocumentNotFoundException:
             return "Airport not found", 404
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500

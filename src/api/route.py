@@ -57,7 +57,7 @@ class RouteId(Resource):
             data = request.json
             couchbase_db.insert_document(ROUTE_COLLECTION, key=id, doc=data)
             return data, 201
-        except DocumentExistsException as e:
+        except DocumentExistsException:
             return "Route already exists", 409
         except (CouchbaseException, Exception) as e:
             return f"Unexpected error: {e}", 500
