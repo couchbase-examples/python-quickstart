@@ -44,7 +44,7 @@ route_model = route_ns.model(
 @route_ns.doc(params={"id": "Route ID like route_10000"})
 class RouteId(Resource):
     @route_ns.doc(
-        description="Create Route with specified ID. \n\n This provides an example of using Key Value operations in Couchbase to create a new document with a specified ID.\n\n Code: `api/route.py` \n Class: `RouteId` \n Method: `post`",
+        description="Create Route with specified ID. \n\n This provides an example of using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) in Couchbase to create a new document with a specified ID.\n\n Key Value operations are unique to Couchbase and provide very high speed get/set/delete operations.\n\n Code: `api/route.py` \n Class: `RouteId` \n Method: `post`",
         responses={
             201: "Created",
             409: "Route already exists",
@@ -63,7 +63,7 @@ class RouteId(Resource):
             return f"Unexpected error: {e}", 500
 
     @route_ns.doc(
-        description="Get Route with specified ID. \n\n This provides an example of using Key Value operations in Couchbase to get a document with specified ID.\n\n Code: `api/route.py` \n Class: `RouteId` \n Method: `get`",
+        description="Get Route with specified ID. \n\n This provides an example of using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) in Couchbase to get a document with specified ID.\n\n Key Value operations are unique to Couchbase and provide very high speed get/set/delete operations.\n\n Code: `api/route.py` \n Class: `RouteId` \n Method: `get`",
         responses={
             200: "Route",
             404: "Route ID not found",
@@ -81,7 +81,7 @@ class RouteId(Resource):
             return f"Unexpected error: {e}", 500
 
     @route_ns.doc(
-        description="Update Route with specified ID. \n\n This provides an example of using Key Value operations in Couchbase to upsert a document with specified ID.\n\n Code: `api/route.py` \n Class: `RouteId` \n Method: `put`",
+        description="Update Route with specified ID. \n\n This provides an example of using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) in Couchbase to upsert a document with specified ID.\n\n Key Value operations are unique to Couchbase and provide very high speed get/set/delete operations.\n\n Code: `api/route.py` \n Class: `RouteId` \n Method: `put`",
         responses={
             200: "Route Updated",
             500: "Unexpected Error",
@@ -97,7 +97,7 @@ class RouteId(Resource):
             return f"Unexpected error: {e}", 500
 
     @route_ns.doc(
-        description="Delete Route with specified ID. \n\n This provides an example of using Key Value operations in Couchbase to delete a document with specified ID.\n\n Code: `api/route.py` \n Class: `RouteId` \n Method: `delete`",
+        description="Delete Route with specified ID. \n\n This provides an example of using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) in Couchbase to delete a document with specified ID.\n\n Key Value operations are unique to Couchbase and provide very high speed get/set/delete operations.\n\n Code: `api/route.py` \n Class: `RouteId` \n Method: `delete`",
         responses={
             204: "Route Deleted",
             404: "Route not found",

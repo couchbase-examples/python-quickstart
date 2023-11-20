@@ -51,7 +51,7 @@ airport_model = airport_ns.model(
 @airport_ns.doc(params={"id": "Airport ID like airport_1273"})
 class AirportId(Resource):
     @airport_ns.doc(
-        description="Create Airport with specified ID. \n\n This provides an example of using Key Value operations in Couchbase to create a new document with a specified ID.\n\n Code: `api/airport.py` \n Class: `AirportId` \n Method: `post`",
+        description="Create Airport with specified ID. \n\n This provides an example of using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) in Couchbase to create a new document with a specified ID.\n\n Key Value operations are unique to Couchbase and provide very high speed get/set/delete operations.\n\n Code: `api/airport.py` \n Class: `AirportId` \n Method: `post`",
         responses={
             201: "Created",
             409: "Airport already exists",
@@ -70,7 +70,7 @@ class AirportId(Resource):
             return f"Unexpected error: {e}", 500
 
     @airport_ns.doc(
-        description="Get Airport with specified ID. \n\n This provides an example of using Key Value operations in Couchbase to get a document with specified ID.\n\n Code: `api/airport.py` \n Class: `AirportId` \n Method: `get`",
+        description="Get Airport with specified ID. \n\n This provides an example of using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) in Couchbase to get a document with specified ID.\n\n Key Value operations are unique to Couchbase and provide very high speed get/set/delete operations.\n\n Code: `api/airport.py` \n Class: `AirportId` \n Method: `get`",
         responses={
             200: "Found Airport",
             404: "Airport ID not found",
@@ -88,7 +88,7 @@ class AirportId(Resource):
             return f"Unexpected error: {e}", 500
 
     @airport_ns.doc(
-        description="Update Airport with specified ID. \n\n This provides an example of using Key Value operations in Couchbase to upsert a document with specified ID.\n\n Code: `api/airport.py` \n Class: `AirportId` \n Method: `put`",
+        description="Update Airport with specified ID. \n\n This provides an example of using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) in Couchbase to upsert a document with specified ID.\n\n Key Value operations are unique to Couchbase and provide very high speed get/set/delete operations.\n\n Code: `api/airport.py` \n Class: `AirportId` \n Method: `put`",
         responses={
             200: "Airport Updated",
             500: "Unexpected Error",
@@ -104,7 +104,7 @@ class AirportId(Resource):
             return f"Unexpected error: {e}", 500
 
     @airport_ns.doc(
-        description="Delete Airport with specified ID. \n\n This provides an example of using Key Value operations in Couchbase to delete a document with specified ID.\n\n Code: `api/airport.py` \n Class: `AirportId` \n Method: `delete`",
+        description="Delete Airport with specified ID. \n\n This provides an example of using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) in Couchbase to delete a document with specified ID.\n\n Key Value operations are unique to Couchbase and provide very high speed get/set/delete operations.\n\n Code: `api/airport.py` \n Class: `AirportId` \n Method: `delete`",
         responses={
             204: "Airport Deleted",
             404: "Airport not found",
@@ -123,7 +123,7 @@ class AirportId(Resource):
 
 @airport_ns.route("/list")
 @airport_ns.doc(
-    description="Get list of Airports. Optionally, you can filter the list by Country. \n\n This provides an example of using a SQL++ query in Couchbase to fetch a list of documents matching the specified criteria.\n\n Code: `api/airport.py` \n Class: `AirportList` \n Method: `get`",
+    description="Get list of Airports. Optionally, you can filter the list by Country. \n\n This provides an example of using a [SQL++ query](https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html) in Couchbase to fetch a list of documents matching the specified criteria.\n\n Code: `api/airport.py` \n Class: `AirportList` \n Method: `get`",
     reponses={200: "List of airports", 500: "Unexpected Error"},
     params={
         "country": {
@@ -204,7 +204,7 @@ destination_airports_model = airport_ns.model(
 
 @airport_ns.route("/direct-connections")
 @airport_ns.doc(
-    description="Get Direct Connections from specified Airport. \n\n This provides an example of using a SQL++ query in Couchbase to fetch a list of documents matching the specified criteria.\n\n Code: `api/airport.py` \n Class: `DirectConnections` \n Method: `get`",
+    description="Get Direct Connections from specified Airport. \n\n This provides an example of using a [SQL++ query](https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html) in Couchbase to fetch a list of documents matching the specified criteria.\n\n Code: `api/airport.py` \n Class: `DirectConnections` \n Method: `get`",
     reponses={200: "List of direct connections", 500: "Unexpected Error"},
     params={
         "airport": {
