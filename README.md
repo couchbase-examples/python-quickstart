@@ -134,7 +134,7 @@ If you are running this quickstart with a self managed Couchbase cluster, you ne
 
 You need to update the connection string and the credentials in the `.env` file in the source folder.
 
-> Note: Couchbase Server must be installed and running prior to running the Flask Python app.
+> Note: Couchbase Server version 7 or higher must be installed and running prior to running the Flask Python app.
 
 ### Swagger Documentation
 
