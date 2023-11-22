@@ -38,7 +38,9 @@ python -m pip install -r requirements.txt
 ```
 
 > Note: Python SDKs older than version 4.1.9 require OpenSSL v1.1. This might not be the default in some newer platforms. In such scenarios, please install the SDK without using the prebuilt wheels
+
 > `python -m pip install couchbase --no-binary couchbase`
+
 > Refer to the source for more info: https://github.com/couchbase/couchbase-python-client#alternative-installation-methods
 
 ### Setup Database Server Configuration
