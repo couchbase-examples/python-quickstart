@@ -41,7 +41,7 @@ python -m pip install -r requirements.txt
 
 > `python -m pip install couchbase --no-binary couchbase`
 
-> Refer to the source for more info: https://github.com/couchbase/couchbase-python-client#alternative-installation-methods
+> Refer to the [instructions in the SDK](https://github.com/couchbase/couchbase-python-client#alternative-installation-methods) for more info.
 
 ### Setup Database Server Configuration
 
