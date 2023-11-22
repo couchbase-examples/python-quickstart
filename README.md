@@ -2,7 +2,10 @@
 
 #### REST API using Couchbase Capella in Python using Flask
 
-> This repo is designed to teach you how to connect to a Couchbase Capella cluster to create, read, update, and delete documents using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) and how to write simple parametrized [SQL++ queries](https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html) using the built-in travel-sample bucket. If you want to run this tutorial using a self managed Couchbase cluster, please refer to the [appendix](#running-self-managed-couchbase-cluster).
+Often, the first step developers do after creating their database is to create a REST API that can perform Create, Read, Update, and Delete (CRUD) operations for that database. This repo is designed to teach you and give you a starter project (in Python using Flask) to generate such a REST API. After you have installed travel-sample bucket in your database, you can run this application which is a REST API with Swagger documentation so that you can learn:
+
+1. How to create, read, update, and delete documents using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) (KV operations). KV operations are unique to couchbase and provide super fast (think microseconds) queries.
+2. How to write simple parametrized [SQL++ queries](https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html) using the built-in travel-sample bucket.
 
 Full documentation for the tutorial can be found on the [Couchbase Developer Portal](https://developer.couchbase.com/tutorial-quickstart-flask-python/).
 
@@ -98,7 +101,7 @@ Once the application starts, you can see the details of the application on the l
 
 ![Application Startup](app_startup.png)
 
-The application will run on port 8080 of your local machine (http://localhost:8080). You will find the interactive Swagger documentation of the API if you go to the URL in your browser. Swagger documentation is used in this demo to showcase the different API end points and how they can be invoked.
+The application will run on port 8080 of your local machine (http://localhost:8080). You will find the interactive Swagger documentation of the API if you go to the URL in your browser. Swagger documentation is used in this demo to showcase the different API end points and how they can be invoked. More details on the Swagger documentation can be found in the [appendix](#swagger-documentation).
 
 ![Swagger Documentation](swagger_documentation.png)
 
