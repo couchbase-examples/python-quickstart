@@ -14,12 +14,9 @@ To run this prebuilt project, you will need:
   - To run this tutorial using a self managed Couchbase cluster, please refer to the [appendix](#appendix-running-self-managed-couchbase-cluster).
 - [Python](https://www.python.org/downloads/) 3.9 or higher installed
   - Ensure that the Python version is [compatible](https://docs.couchbase.com/python-sdk/current/project-docs/compatibility.html#python-version-compat) with the Couchbase SDK.
-
-### Loading Travel Sample Bucket
-
-If travel-sample is not loaded in your Capella cluster, you can load it by following the instructions for your Capella Cluster:
-
-- [Load travel-sample bucket in Couchbase Capella](https://docs.couchbase.com/cloud/clusters/data-service/import-data-documents.html#import-sample-data)
+- Loading Travel Sample Bucket
+  If travel-sample is not loaded in your Capella cluster, you can load it by following the instructions for your Capella Cluster:
+  - [Load travel-sample bucket in Couchbase Capella](https://docs.couchbase.com/cloud/clusters/data-service/import-data-documents.html#import-sample-data)
 
 ## App Setup
 
@@ -39,6 +36,10 @@ The dependencies for the application are specified in the `requirements.txt` fil
 cd src
 python -m pip install -r requirements.txt
 ```
+
+> Note: Python SDKs older than version 4.1.9 require OpenSSL v1.1. This might not be the default in some newer platforms. In such scenarios, please install the SDK without using the prebuilt wheels
+> `python -m pip install couchbase --no-binary couchbase`
+> Refer to the source for more info: https://github.com/couchbase/couchbase-python-client#alternative-installation-methods
 
 ### Setup Database Server Configuration
 
@@ -99,24 +100,6 @@ The application will run on port 8080 of your local machine (http://localhost:80
 
 ![Swagger Documentation](swagger_documentation.png)
 
-### Using the Swagger Documentation
-
-Swagger documentation provides a clear view of the API including endpoints, HTTP methods, request parameters, and response objects.
-
-Click on an individual endpoint to expand it and see detailed information. This includes the endpoint's description, possible response status codes, and the request parameters it accepts.
-
-#### Trying Out the API
-
-You can try out an API by clicking on the "Try it out" button next to the endpoints.
-
-- Parameters: If an endpoint requires parameters, Swagger UI provides input boxes for you to fill in. This could include path parameters, query strings, headers, or the body of a POST/PUT request.
-
-- Execution: Once you've inputted all the necessary parameters, you can click the "Execute" button to make a live API call. Swagger UI will send the request to the API and display the response directly in the documentation. This includes the response code, response headers, and response body.
-
-#### Models
-
-Swagger documents the structure of request and response bodies using models. These models define the expected data structure using JSON schema and are extremely helpful in understanding what data to send and expect.
-
 ## Running Tests
 
 To run the tests, use the following commands:
@@ -150,3 +133,21 @@ If you are running this quickstart with a self managed Couchbase cluster, you ne
 You need to update the connection string and the credentials in the `.env` file in the source folder.
 
 > Note: Couchbase Server must be installed and running prior to running the Flask Python app.
+
+### Swagger Documentation
+
+Swagger documentation provides a clear view of the API including endpoints, HTTP methods, request parameters, and response objects.
+
+Click on an individual endpoint to expand it and see detailed information. This includes the endpoint's description, possible response status codes, and the request parameters it accepts.
+
+#### Trying Out the API
+
+You can try out an API by clicking on the "Try it out" button next to the endpoints.
+
+- Parameters: If an endpoint requires parameters, Swagger UI provides input boxes for you to fill in. This could include path parameters, query strings, headers, or the body of a POST/PUT request.
+
+- Execution: Once you've inputted all the necessary parameters, you can click the "Execute" button to make a live API call. Swagger UI will send the request to the API and display the response directly in the documentation. This includes the response code, response headers, and response body.
+
+#### Models
+
+Swagger documents the structure of request and response bodies using models. These models define the expected data structure using JSON schema and are extremely helpful in understanding what data to send and expect.
