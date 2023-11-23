@@ -1,59 +1,158 @@
 # Quickstart in Couchbase with Flask and Python
 
-#### Build a REST API with Couchbase's Python SDK 4 and Flask
+#### REST API using Couchbase Capella in Python using Flask
 
-> This repo is designed to teach you how to connect to a Couchbase cluster to create, read, update, and delete documents and how to write simple parametrized N1QL queries.
+Often, the first step developers do after creating their database is to create a REST API that can perform Create, Read, Update, and Delete (CRUD) operations for that database. This repo is designed to teach you and give you a starter project (in Python using Flask) to generate such a REST API. After you have installed travel-sample bucket in your database, you can run this application which is a REST API with Swagger documentation so that you can learn:
 
-[![Try it now!](https://da-demo-images.s3.amazonaws.com/runItNow_outline.png?couchbase-example=python-flaskquickstart-repo&source=github)](https://gitpod.io/#https://github.com/couchbase-examples/python-quickstart)
+1. How to create, read, update, and delete documents using [Key Value operations](https://docs.couchbase.com/python-sdk/current/howtos/kv-operations.html) (KV operations). KV operations are unique to couchbase and provide super fast (think microseconds) queries.
+2. How to write simple parametrized [SQL++ queries](https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html) using the built-in travel-sample bucket.
 
-Full documentation can be found on the [Couchbase Developer Portal](https://developer.couchbase.com/tutorial-quickstart-flask-python/).
+Full documentation for the tutorial can be found on the [Couchbase Developer Portal](https://developer.couchbase.com/tutorial-quickstart-flask-python/).
 
 ## Prerequisites
 
 To run this prebuilt project, you will need:
 
-- Couchbase 7 Installed
-- [Python v3.x](https://www.python.org/downloads/) installed
-- Code Editor installed
+- [Couchbase Capella](https://www.couchbase.com/products/capella/) cluster with [travel-sample](https://docs.couchbase.com/python-sdk/current/ref/travel-app-data-model.html) bucket loaded.
+  - To run this tutorial using a self managed Couchbase cluster, please refer to the [appendix](#appendix-running-self-managed-couchbase-cluster).
+- [Python](https://www.python.org/downloads/) 3.9 or higher installed
+  - Ensure that the Python version is [compatible](https://docs.couchbase.com/python-sdk/current/project-docs/compatibility.html#python-version-compat) with the Couchbase SDK.
+- Loading Travel Sample Bucket
+  If travel-sample is not loaded in your Capella cluster, you can load it by following the instructions for your Capella Cluster:
+  - [Load travel-sample bucket in Couchbase Capella](https://docs.couchbase.com/cloud/clusters/data-service/import-data-documents.html#import-sample-data)
+
+## App Setup
+
+We will walk through the different steps required to get the application running.
+
+### Cloning Repo
+
+```shell
+git clone https://github.com/couchbase-examples/python-quickstart.git
+```
 
 ### Install Dependencies
 
-Dependencies can be installed through PIP the default package manage for Python.
+The dependencies for the application are specified in the `requirements.txt` file in the source folder. Dependencies can be installed through `pip` the default package manager for Python.
 
-```sh
+```shell
+cd src
 python -m pip install -r requirements.txt
 ```
 
-### Database Server Configuration
+> Note: Python SDKs older than version 4.1.9 require OpenSSL v1.1. This might not be the default in some newer platforms. In such scenarios, please install the SDK without using the prebuilt wheels
 
-All configuration for communication with the database is stored in the `.env` file in the src folder. This includes the connection string, username, password, bucket name, colleciton name, and scope name.
+> `python -m pip install couchbase --no-binary couchbase`
 
-There is an example file `.env.example` that can be used as the template for the pararmeters for your environment. You can copy this file and fill in with the values corresponding to your environment.
+> Refer to the [instructions in the SDK](https://github.com/couchbase/couchbase-python-client#alternative-installation-methods) for more info.
 
-Note: If you are running with [Couchbase Capella](https://cloud.couchbase.com/), you need to change the `connect()` method to use TLS (currently commented out). Also ensure that the bucket exists on the cluster and your [IP address is whitelisted](https://docs.couchbase.com/cloud/get-started/cluster-and-data.html#allowed) on the Cluster. We do not use Certificates for authentication in this tutorial for simplicity. However for production use cases, it is recommended to enable Certificates.
+### Setup Database Server Configuration
 
-In order to initialize the scope and collection in the Capella cluster, you need to change the `initialize_db()` in `db_init.py` to use TLS (currently commented out).
+To know more about connecting to your Capella cluster, please follow the [instructions](https://docs.couchbase.com/cloud/get-started/connect.html).
+
+Specifically, you need to do the following:
+
+- Create the [database credentials](https://docs.couchbase.com/cloud/clusters/manage-database-users.html) to access the travel-sample bucket (Read and Write) used in the application.
+- [Allow access](https://docs.couchbase.com/cloud/clusters/allow-ip-address.html) to the Cluster from the IP on which the application is running.
+
+All configuration for communication with the database is read from the environment variables. We have provided a convenience feature in this quickstart to read the environment variables from a local file, `.env` in the source folder.
+
+Create a copy of `.env.example` file and rename it to .env and add the values for the Couchbase connection.
+
+```shell
+DB_CONN_STR=<connection_string>
+DB_USERNAME=<user_with_read_write_permission_to_travel-sample_bucket>
+DB_PASSWORD=<password_for_user>
+```
+
+> Note: The connection string expects the `couchbases://` or `couchbase://` part.
 
 ## Running The Application
 
-At this point the application is ready and you can run it. The bucket along with the scope and collection will be created on the cluster. For Capella, you need to ensure that the bucket is created before running the application.
+### Directly on Machine
+
+At this point, we have installed the dependencies, loaded the travel-sample data and configured the application with the credentials. The application is now ready and you can run it.
 
 ```sh
 cd src
-python db_init.py && flask run
+python app.py
 ```
 
-> \*Couchbase 7 must be installed and running on localhost (http://127.0.0.1:8091) prior to running the Flask Python app unless running Couchbase Capella.
+### Using Docker
 
-## Running The Tests
-
-To run the standard integration tests, use the following commands:
+- Build the Docker image
 
 ```sh
 cd src
-pytest test.py
+docker build -t couchbase-flask-quickstart .
 ```
 
-## Conclusion
+- Run the Docker image
 
-Setting up a basic REST API in Flask and Python with Couchbase is fairly simple. In this project when ran with Couchbase Server 7 installed, it will create a bucket in Couchbase, an index for our parameterized [N1QL query](https://docs.couchbase.com/python-sdk/current/howtos/n1ql-queries-with-sdk.html), and showcases basic CRUD operations needed in most applications.
+```sh
+docker run -it --env-file .env -p 8080:8080 couchbase-flask-quickstart
+```
+
+> Note: The `.env` file has the connection information to connect to your Capella cluster. These will be part of the environment variables in the Docker container.
+
+### Verifying the Application
+
+Once the application starts, you can see the details of the application on the logs.
+
+![Application Startup](app_startup.png)
+
+The application will run on port 8080 of your local machine (http://localhost:8080). You will find the interactive Swagger documentation of the API if you go to the URL in your browser. Swagger documentation is used in this demo to showcase the different API end points and how they can be invoked. More details on the Swagger documentation can be found in the [appendix](#swagger-documentation).
+
+![Swagger Documentation](swagger_documentation.png)
+
+## Running Tests
+
+To run the tests, use the following commands:
+
+```sh
+cd src
+python -m pytest
+```
+
+## Appendix
+
+### Data Model
+
+For this quickstart, we use three collections, `airport`, `airline` and `routes` that contain sample airports, airlines and airline routes respectively. The routes collection connects the airports and airlines as seen in the figure below. We use these connections in the quickstart to generate airports that are directly connected and airlines connecting to a destination airport. Note that these are just examples to highlight how you can use SQL++ queries to join the collections.
+
+![travel sample data model](travel_sample_data_model.png)
+
+### Extending API by Adding New Entity
+
+If you would like to add another entity to the APIs, these are the steps to follow:
+
+- Create the new entity (collection) in the Couchbase bucket. You can create the collection using the [SDK](https://docs.couchbase.com/sdk-api/couchbase-python-client/couchbase_api/couchbase_management.html#couchbase.management.collections.CollectionManager.create_collection) or via the [Couchbase Server interface](https://docs.couchbase.com/cloud/n1ql/n1ql-language-reference/createcollection.html).
+- Define the routes in a new file in the `api` folder similar to the existing routes like `airport.py`.
+- Add the new routes to the application in `app.py`.
+- Add the tests for the new routes in a new file in the `tests` folder similar to `test_airport.py`.
+
+### Running Self Managed Couchbase Cluster
+
+If you are running this quickstart with a self managed Couchbase cluster, you need to [load](https://docs.couchbase.com/server/current/manage/manage-settings/install-sample-buckets.html) the travel-sample data bucket in your cluster and generate the credentials for the bucket.
+
+You need to update the connection string and the credentials in the `.env` file in the source folder.
+
+> Note: Couchbase Server version 7 or higher must be installed and running prior to running the Flask Python app.
+
+### Swagger Documentation
+
+Swagger documentation provides a clear view of the API including endpoints, HTTP methods, request parameters, and response objects.
+
+Click on an individual endpoint to expand it and see detailed information. This includes the endpoint's description, possible response status codes, and the request parameters it accepts.
+
+#### Trying Out the API
+
+You can try out an API by clicking on the "Try it out" button next to the endpoints.
+
+- Parameters: If an endpoint requires parameters, Swagger UI provides input boxes for you to fill in. This could include path parameters, query strings, headers, or the body of a POST/PUT request.
+
+- Execution: Once you've inputted all the necessary parameters, you can click the "Execute" button to make a live API call. Swagger UI will send the request to the API and display the response directly in the documentation. This includes the response code, response headers, and response body.
+
+#### Models
+
+Swagger documents the structure of request and response bodies using models. These models define the expected data structure using JSON schema and are extremely helpful in understanding what data to send and expect.
