@@ -48,16 +48,16 @@ python -m pip install -r requirements.txt
 
 ### Setup Database Server Configuration
 
-All configuration for communication with the database is read from the environment variables. We have provided a convenience feature in this quickstart to read the environment variables from a local file, `.env` in the source folder.
-
-Create a copy of `.env.example` file and rename it to .env and add the values for the Couchbase connection.
-
 To know more about connecting to your Capella cluster, please follow the [instructions](https://docs.couchbase.com/cloud/get-started/connect.html).
 
 Specifically, you need to do the following:
 
 - Create the [database credentials](https://docs.couchbase.com/cloud/clusters/manage-database-users.html) to access the travel-sample bucket (Read and Write) used in the application.
 - [Allow access](https://docs.couchbase.com/cloud/clusters/allow-ip-address.html) to the Cluster from the IP on which the application is running.
+
+All configuration for communication with the database is read from the environment variables. We have provided a convenience feature in this quickstart to read the environment variables from a local file, `.env` in the source folder.
+
+Create a copy of `.env.example` file and rename it to .env and add the values for the Couchbase connection.
 
 ```shell
 DB_CONN_STR=<connection_string>
