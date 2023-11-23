@@ -14,7 +14,7 @@ Full documentation for the tutorial can be found on the [Couchbase Developer Por
 To run this prebuilt project, you will need:
 
 - [Couchbase Capella](https://www.couchbase.com/products/capella/) cluster with [travel-sample](https://docs.couchbase.com/python-sdk/current/ref/travel-app-data-model.html) bucket loaded.
-  - To run this tutorial using a self managed Couchbase cluster, please refer to the [appendix](#appendix-running-self-managed-couchbase-cluster).
+  - To run this tutorial using a self managed Couchbase cluster, please refer to the [appendix](#running-self-managed-couchbase-cluster).
 - [Python](https://www.python.org/downloads/) 3.9 or higher installed
   - Ensure that the Python version is [compatible](https://docs.couchbase.com/python-sdk/current/project-docs/compatibility.html#python-version-compat) with the Couchbase SDK.
 - Loading Travel Sample Bucket
@@ -46,7 +46,7 @@ python -m pip install -r requirements.txt
 
 > Refer to the [instructions in the SDK](https://github.com/couchbase/couchbase-python-client#alternative-installation-methods) for more info.
 
-### Setup Database Server Configuration
+### Setup Database Configuration
 
 To know more about connecting to your Capella cluster, please follow the [instructions](https://docs.couchbase.com/cloud/get-started/connect.html).
 
@@ -107,7 +107,7 @@ The application will run on port 8080 of your local machine (http://localhost:80
 
 ## Running Tests
 
-To run the tests, use the following commands:
+To run the integration tests, use the following commands:
 
 ```sh
 cd src
