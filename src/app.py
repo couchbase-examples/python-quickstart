@@ -2,6 +2,7 @@ from extensions import couchbase_db
 from api.airport import airport_ns
 from api.airline import airline_ns
 from api.route import route_ns
+from api.hotel import hotel_ns
 import os
 from dotenv import load_dotenv
 from flask import Flask
@@ -63,6 +64,7 @@ couchbase_db.connect()
 api.add_namespace(airport_ns, path="/api/v1/airport")
 api.add_namespace(airline_ns, path="/api/v1/airline")
 api.add_namespace(route_ns, path="/api/v1/route")
+api.add_namespace(hotel_ns, path="/api/v1/hotel")
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=8080)
