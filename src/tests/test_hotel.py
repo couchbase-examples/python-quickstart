@@ -2,6 +2,29 @@ import requests
 
 
 class TestHotel:
+    def test_hotel_autocomplete_search(self, hotel_api):
+        """Test searching hotels by name."""
+        url = f"{hotel_api}/autocomplete"
+        search_term = "KCL"
+
+        response = requests.get(url, params={"name": search_term})
+        assert response.status_code == 200
+
+        result = response.json()
+        assert len(result) > 0
+        assert all(search_term.lower() in hotel["name"].lower() for hotel in result)
+
+    def test_hotel_autocomplete_search_no_results(self, hotel_api):
+        """Test searching hotels by name with a term that should yield no results."""
+        url = f"{hotel_api}/autocomplete"
+        search_term = "XYZNonexistentHotel"
+
+        response = requests.get(url, params={"name": search_term})
+        assert response.status_code == 200
+
+        result = response.json()
+        assert len(result) == 0
+
     def test_hotel_autocomplete(self, hotel_api):
         """Test the autocomplete endpoint with a valid name query parameter."""
         url = f"{hotel_api}/autocomplete?name=sea"
@@ -11,6 +34,17 @@ class TestHotel:
         result = response.json()
         assert isinstance(result, list)
         assert len(result) == 25
+
+    def test_hotel_filter_no_results(self, hotel_api):
+        """Test filtering with criteria that should yield no results."""
+        url = f"{hotel_api}/filter"
+        impossible_filter = {"city": "NonexistentCity", "country": "NonexistentCountry"}
+
+        response = requests.post(url, json=impossible_filter)
+        assert response.status_code == 200
+
+        result = response.json()
+        assert len(result) == 0
 
     def test_hotel_all_filter(self, hotel_api):
         """Test filtering hotels with specific filters."""
@@ -40,6 +74,18 @@ class TestHotel:
 
         result = response.json()
         assert result == expected_hotels
+
+    def test_hotel_country_filter(self, hotel_api):
+        """Test filtering hotels by country."""
+        url = f"{hotel_api}/filter"
+        country_filter = {"country": "United States"}
+
+        response = requests.post(url, json=country_filter)
+        assert response.status_code == 200
+
+        result = response.json()
+        assert len(result) > 0
+        assert all(hotel["country"] == "United States" for hotel in result)
 
     def test_hotel_with_single_filter(self, hotel_api):
         """Test filtering hotels with a single description filter."""

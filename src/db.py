@@ -66,6 +66,8 @@ class CouchbaseClient(object):
 
             # get a reference to our scope
             self.scope = self.bucket.scope(self.scope_name)
+            # Call the method to create the fts index
+            self.create_search_index()
 
             try:
                 scope_index_manager = self.bucket.scope(
@@ -95,6 +97,21 @@ class CouchbaseClient(object):
             )
             print(e)
             exit()
+
+    def create_search_index(self) -> None:
+        """Upsert a fts index in the Couchbase cluster"""
+        try:
+            scope_index_manager = self.bucket.scope(self.scope_name).search_indexes()
+            with open(f"{self.index_name}_index.json", "r") as f:
+                index_definition = json.load(f)
+
+            # Upsert the index
+            scope_index_manager.upsert_index(SearchIndex.from_json(index_definition))
+            print(f"Index '{self.index_name}' created or updated successfully.")
+        except QueryIndexAlreadyExistsException:
+            print(f"Index with name '{self.index_name}' already exists")
+        except Exception as e:
+            print(f"Error upserting index '{self.index_name}': {e}")
 
     def get_document(self, collection_name: str, key: str):
         """Get document by key using KV operation"""
