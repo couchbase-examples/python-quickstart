@@ -4,6 +4,8 @@ from couchbase.options import ClusterOptions
 from couchbase.auth import PasswordAuthenticator
 from couchbase.exceptions import CouchbaseException
 from datetime import timedelta
+from couchbase.result import PingResult
+from couchbase.diagnostics import PingState, ServiceType
 from couchbase.management.search import SearchIndex
 from couchbase.exceptions import QueryIndexAlreadyExistsException
 from couchbase.options import SearchOptions
@@ -66,23 +68,13 @@ class CouchbaseClient(object):
 
             # get a reference to our scope
             self.scope = self.bucket.scope(self.scope_name)
-            # Call the method to create the fts index
-            self.create_search_index()
-
-            try:
-                scope_index_manager = self.bucket.scope(
-                    self.scope_name
-                ).search_indexes()
-                index_definition = json.loads(
-                    open(f"{self.index_name}_index.json").read()
+            # Call the method to create the fts index if search service is enabled
+            if self.is_search_service_enabled():
+                self.create_search_index()
+            else:
+                print(
+                    "Search service is not enabled on this cluster. Skipping search index creation."
                 )
-                scope_index_manager.upsert_index(
-                    SearchIndex.from_json(index_definition)
-                )
-            except QueryIndexAlreadyExistsException:
-                print(f"Index with name '{self.index_name}' already exists")
-            except Exception as e:
-                print(f"Error upserting index '{self.index_name}': {e}")
 
     def check_scope_exists(self) -> bool:
         """Check if the scope exists in the bucket"""
@@ -97,6 +89,21 @@ class CouchbaseClient(object):
             )
             print(e)
             exit()
+
+    def is_search_service_enabled(self, min_nodes: int = 1) -> bool:
+        try:
+            ping_result: PingResult = self.cluster.ping()
+            search_endpoints = ping_result.endpoints[ServiceType.Search]
+            available_search_nodes = 0
+            for endpoint in search_endpoints:
+                if endpoint.state == PingState.OK:
+                    available_search_nodes += 1
+            return available_search_nodes >= min_nodes
+        except Exception as e:
+            print(
+                f"Error checking search service status. \nEnsure that Search Service is enabled: {e}"
+            )
+            return False
 
     def create_search_index(self) -> None:
         """Upsert a fts index in the Couchbase cluster"""
