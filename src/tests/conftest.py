@@ -56,6 +56,11 @@ def route_collection():
     return "route"
 
 
+@pytest.fixture(scope="module")
+def hotel_api():
+    return f"{BASE_URI}/hotel"
+
+
 class Helpers:
     @staticmethod
     def delete_existing_document(couchbase_client, collection, key):

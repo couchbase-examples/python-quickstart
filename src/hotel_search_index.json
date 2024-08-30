@@ -1,0 +1,155 @@
+{
+    "name": "hotel_search",
+    "type": "fulltext-index",
+    "sourceType": "gocbcore",
+    "sourceName": "travel-sample",
+    "planParams": {
+      "indexPartitions": 1,
+      "numReplicas": 0
+    },
+    "params": {
+      "doc_config": {
+        "docid_prefix_delim": "",
+        "docid_regexp": "",
+        "mode": "scope.collection.type_field",
+        "type_field": "type"
+      },
+      "mapping": {
+        "analysis": {
+          "analyzers": {
+            "edge_ngram": {
+              "token_filters": [
+                "to_lower",
+                "edge_ngram_2_8"
+              ],
+              "tokenizer": "unicode",
+              "type": "custom"
+            }
+          },
+          "token_filters": {
+            "edge_ngram_2_8": {
+              "back": false,
+              "max": 8,
+              "min": 2,
+              "type": "edge_ngram"
+            }
+          }
+        },
+        "default_analyzer": "standard",
+        "default_datetime_parser": "dateTimeOptional",
+        "index_dynamic": false,
+        "store_dynamic": false,
+        "default_mapping": {
+          "dynamic": true,
+          "enabled": false
+        },
+        "types": {
+          "inventory.hotel": {
+            "dynamic": false,
+            "enabled": true,
+            "properties": {
+              "title": {
+                "enabled": true,
+                "fields":[
+                  {
+                    "docvalues": true,
+                    "include_in_all": false,
+                    "include_term_vectors": false,
+                    "index": true,
+                    "name": "title",
+                    "store": true,
+                    "type": "text"
+                  }
+                ]
+              },
+              "name": {
+                "enabled": true,
+                "fields":[
+                  {
+                    "docvalues": true,
+                    "include_in_all": false,
+                    "include_term_vectors": false,
+                    "index": true,
+                    "name": "name",
+                    "store": true,
+                    "type": "text",
+                    "analyzer": "edge_ngram"
+                  },
+                  {
+                    "docvalues": true,
+                    "include_in_all": false,
+                    "include_term_vectors": false,
+                    "index": true,
+                    "name": "name_keyword",
+                    "store": false,
+                    "type": "text",
+                    "analyzer": "keyword"
+                  }
+                ]
+              },
+              "description": {
+                "enabled": true,
+                "fields":[
+                  {
+                    "docvalues": true,
+                    "include_in_all": false,
+                    "include_term_vectors": false,
+                    "index": true,
+                    "name": "description",
+                    "store": true,
+                    "type": "text",
+                    "analyzer": "en"
+                  }
+                ]
+              },
+              "city": {
+                "enabled": true,
+                "fields":[
+                  {
+                    "docvalues": true,
+                    "include_in_all": false,
+                    "include_term_vectors": false,
+                    "index": true,
+                    "name": "city",
+                    "store": true,
+                    "type": "text",
+                    "analyzer": "keyword"
+                  }
+                ]
+              },
+              "state": {
+                "enabled": true,
+                "fields":[
+                  {
+                    "docvalues": true,
+                    "include_in_all": false,
+                    "include_term_vectors": false,
+                    "index": true,
+                    "name": "state",
+                    "store": true,
+                    "type": "text",
+                    "analyzer": "keyword"
+                  }
+                ]
+              },
+              "country": {
+                "enabled": true,
+                "fields":[
+                  {
+                    "docvalues": true,
+                    "include_in_all": false,
+                    "include_term_vectors": false,
+                    "index": true,
+                    "name": "country",
+                    "store": true,
+                    "type": "text",
+                    "analyzer": "keyword"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
