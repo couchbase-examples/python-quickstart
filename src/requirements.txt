@@ -1,4 +1,4 @@
-couchbase==4.5.0
+couchbase==4.6.0
 flask_restx==1.3.0
 pytest==9.0.3
 python-dotenv==1.2.2
