@@ -20,11 +20,13 @@ jobs:
         run: |
           apt update || echo "apt-update failed" # && apt -y upgrade
       - uses: actions/checkout@v3
-      - name: Setup Python
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Setup Python dependencies
         run: |
-          sudo apt -y update
-          sudo apt -y install python3-pip python3-testresources
           cd src
+          python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
       - name: Setup app
         run: |
