@@ -17,8 +17,7 @@ To run this prebuilt project, you will need:
 
 - [Couchbase Capella](https://www.couchbase.com/products/capella/) cluster with [travel-sample](https://docs.couchbase.com/python-sdk/current/ref/travel-app-data-model.html) bucket loaded.
   - To run this tutorial using a self managed Couchbase cluster, please refer to the [appendix](#running-self-managed-couchbase-cluster).
-- [Python](https://www.python.org/downloads/) 3.12 or higher installed
-  - This quickstart is verified in CI and locally with Python 3.12.
+- [Python](https://www.python.org/downloads/) 3.10 or higher installed
   - Ensure that the Python version is [compatible](https://docs.couchbase.com/python-sdk/current/project-docs/compatibility.html#python-version-compat) with the Couchbase SDK.
 - Loading Travel Sample Bucket
   If travel-sample is not loaded in your Capella cluster, you can load it by following the instructions for your Capella Cluster:
@@ -40,14 +39,14 @@ The dependencies for the application are specified in the `requirements.txt` fil
 
 ```shell
 cd src
-python3 -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-> Note: On Windows, or inside an activated virtual environment where `python3` is not available, use `python` in the commands below instead.
+> Note: If your environment only provides a `python3` executable, substitute `python3` in the commands below.
 
 > Note: Python SDKs older than version 4.1.9 require OpenSSL v1.1. This might not be the default in some newer platforms. In such scenarios, please install the SDK without using the prebuilt wheels
 
-> `python3 -m pip install couchbase --no-binary couchbase`
+> `python -m pip install couchbase --no-binary couchbase`
 
 > Refer to the [instructions in the SDK](https://github.com/couchbase/couchbase-python-client#alternative-installation-methods) for more info.
 
@@ -80,7 +79,7 @@ At this point, we have installed the dependencies, loaded the travel-sample data
 
 ```sh
 cd src
-python3 app.py
+python app.py
 ```
 
 ### Using Docker
@@ -116,7 +115,7 @@ To run the integration tests, use the following commands:
 
 ```sh
 cd src
-python3 -m pytest
+python -m pytest
 ```
 
 ## Appendix
