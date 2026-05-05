@@ -17,7 +17,7 @@ To run this prebuilt project, you will need:
 
 - [Couchbase Capella](https://www.couchbase.com/products/capella/) cluster with [travel-sample](https://docs.couchbase.com/python-sdk/current/ref/travel-app-data-model.html) bucket loaded.
   - To run this tutorial using a self managed Couchbase cluster, please refer to the [appendix](#running-self-managed-couchbase-cluster).
-- [Python](https://www.python.org/downloads/) 3.9 or higher installed
+- [Python](https://www.python.org/downloads/) 3.10 or higher installed
   - Ensure that the Python version is [compatible](https://docs.couchbase.com/python-sdk/current/project-docs/compatibility.html#python-version-compat) with the Couchbase SDK.
 - Loading Travel Sample Bucket
   If travel-sample is not loaded in your Capella cluster, you can load it by following the instructions for your Capella Cluster:
@@ -37,12 +37,12 @@ git clone https://github.com/couchbase-examples/python-quickstart.git
 
 The dependencies for the application are specified in the `requirements.txt` file in the source folder. Dependencies can be installed through `pip` the default package manager for Python.
 
-> Note: If your Python is not symbolically linked to python3, you need to run all commands using `python3` instead of `python`.
-
 ```shell
 cd src
 python -m pip install -r requirements.txt
 ```
+
+> Note: If your environment only provides a `python3` executable, substitute `python3` in the commands below.
 
 > Note: Python SDKs older than version 4.1.9 require OpenSSL v1.1. This might not be the default in some newer platforms. In such scenarios, please install the SDK without using the prebuilt wheels
 
