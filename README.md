@@ -142,6 +142,8 @@ If you are running this quickstart with a self managed Couchbase cluster, you ne
 You need to update the connection string and the credentials in the `.env` file in the source folder.
 
 > Note: Couchbase Server version 7 or higher must be installed and running prior to running the Flask Python app.
+>
+> Note: The hotel autocomplete and filter endpoints rely on Full Text Search. For a self-managed walkthrough or the full test suite, make sure the cluster has the Search service enabled so the `hotel_search` index can be created in the `travel-sample.inventory` scope.
 
 ### Swagger Documentation
 
