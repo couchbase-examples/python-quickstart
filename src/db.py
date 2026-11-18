@@ -143,54 +143,43 @@ class CouchbaseClient(object):
         return self.scope.query(sql_query, *options, **kwargs)
 
     def search_by_name(self, name):
-        """Perform a full-text search for hotel names using the given name"""
-        try:
-            searchQuery = search.SearchRequest.create(
-                search.MatchQuery(name, field="name")
-            )
-            searchResult = self.scope.search(
-                self.index_name, searchQuery, SearchOptions(limit=50, fields=["name"])
-            )
-            names = []
-            for row in searchResult.rows():
-                hotel = row.fields
-                names.append(hotel.get("name", ""))
-        except Exception as e:
-            print("Error while performing fts search", {e})
-        return names
+        """Perform a full-text search for hotel names using the given name.
+
+        Search errors propagate to the caller (the API layer maps them to a
+        500 response) instead of being swallowed here.
+        """
+        search_query = search.SearchRequest.create(
+            search.MatchQuery(name, field="name")
+        )
+        search_result = self.scope.search(
+            self.index_name, search_query, SearchOptions(limit=50, fields=["name"])
+        )
+        return [row.fields.get("name", "") for row in search_result.rows()]
 
     def filter(self, filter, limit, offset):
-        """Perform a full-text search with filters and pagination"""
-        try:
-            conjuncts = []
+        """Perform a full-text search with filters and pagination.
 
-            match_query_terms = ["description", "name", "title"]
-            conjuncts.extend(
-                [
-                    MatchQuery(filter[t], field=t)
-                    for t in match_query_terms
-                    if t in filter
-                ]
-            )
-            term_query_terms = ["city", "country", "state"]
-            conjuncts.extend(
-                [TermQuery(filter[t], field=t) for t in term_query_terms if t in filter]
-            )
+        Search errors propagate to the caller (the API layer maps them to a
+        500 response) instead of being swallowed here.
+        """
+        conjuncts = []
 
-            if conjuncts:
-                query = ConjunctionQuery(*conjuncts)
-            else:
-                return []
+        match_query_terms = ["description", "name", "title"]
+        conjuncts.extend(
+            [MatchQuery(filter[t], field=t) for t in match_query_terms if t in filter]
+        )
+        term_query_terms = ["city", "country", "state"]
+        conjuncts.extend(
+            [TermQuery(filter[t], field=t) for t in term_query_terms if t in filter]
+        )
 
-            options = SearchOptions(fields=["*"], limit=limit, skip=offset)
+        if not conjuncts:
+            return []
 
-            result = self.scope.search(
-                self.index_name, search.SearchRequest.create(query), options
-            )
-            hotels = []
-            for row in result.rows():
-                hotel = row.fields
-                hotels.append(hotel)
-        except Exception as e:
-            print("Error while performing fts search", {e})
-        return hotels
+        query = ConjunctionQuery(*conjuncts)
+        options = SearchOptions(fields=["*"], limit=limit, skip=offset)
+
+        result = self.scope.search(
+            self.index_name, search.SearchRequest.create(query), options
+        )
+        return [row.fields for row in result.rows()]
