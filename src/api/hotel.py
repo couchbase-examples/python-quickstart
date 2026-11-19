@@ -44,7 +44,7 @@ class HotelAutoComplete(Resource):
             result = couchbase_db.search_by_name(name=name)
             return [{"name": name} for name in result], 200
         except (CouchbaseException, Exception) as e:
-            return f"Unexpected error: {e}", 500
+            hotel_ns.abort(500, f"Unexpected error: {e}")
 
 
 @hotel_ns.route("/filter")
@@ -80,4 +80,4 @@ class HotelFilter(Resource):
             hotels = couchbase_db.filter(data, limit=limit, offset=offset)
             return hotels, 200
         except (CouchbaseException, Exception) as e:
-            return f"Unexpected error: {e}", 500
+            hotel_ns.abort(500, f"Unexpected error: {e}")
